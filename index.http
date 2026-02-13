@@ -1,0 +1,40 @@
+@apiUrl = http://localhost:3000/api/
+
+### Crear tarea válida
+POST {{apiUrl}}tareas
+Content-Type: application/json
+
+{
+    "title": "Hacer la compra",
+    "description": "Comprar productos necesarios para la casa",
+    "priority": "medium",
+    "completed": false,
+    "dueDate": 9999999999999,
+    "tags": ["compra", "tareas"]
+}
+
+
+### Borrar tarea existente
+DELETE {{apiUrl}}tareas/0
+
+
+### Editar tarea
+PUT {{apiUrl}}tareas/1
+Content-Type: application/json
+
+{
+    "id": 1,
+    "title": "Esta tarea ha sido editada con PUT",
+    "description": "No sé XD",
+    "priority": "low",
+    "completed": true,
+    "dueDate": 999,
+    "tags": ["nada"]
+}
+
+
+// El flujo es:
+// Cuando creo el usuario primero se llama al app.js, que hace lo de despiezar la ruta.
+// El app.js llama a app.use('/api', routes), que llama a routes/index.js;
+// La ruta está despiezada, es decir, de /api/usuarios pasa a solo /usuarios.
+// Y el routes/index.js llama a router.use('/usuarios', usuariosRoutes);
