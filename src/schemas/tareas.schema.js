@@ -9,12 +9,16 @@ export const createTareaSchema = z.object({
     description: z.string().optional(),
     priority: z.enum(['low', 'medium', 'high']),
     completed: z.boolean().default(false),
-    dueDate: z.number(),
+    dueDate: z.coerce.date(),
     tags: z.array(z.string()).optional(),
-    createdAt: z.date().default(() => new Date()),
-    updatedAt: z.date().default(() => new Date()),
+    createdAt: z.coerce.date().default(() => new Date()),
+    updatedAt: z.coerce.date().default(() => new Date()),
+  }).refine((data) => data.dueDate > data.createdAt, {
+    message: "La fecha límite debe ser posterior a la fecha de creación",
+    path: ["dueDate"],
   })
 });
+
 
 export const updateTareaSchema = z.object({
   body: z.object({
@@ -22,9 +26,12 @@ export const updateTareaSchema = z.object({
     description: z.string().optional(),
     priority: z.enum(['low', 'medium', 'high']),
     completed: z.boolean(),
-    dueDate: z.number(),
+    dueDate: z.coerce.date(),
     tags: z.array(z.string()).optional(),
-    createdAt: z.date().optional(),
-    updatedAt: z.date().default(() => new Date()),
-  }),
+    createdAt: z.coerce.date().default(() => new Date()),
+    updatedAt: z.coerce.date().default(() => new Date()),
+  }).refine((data) => data.dueDate > data.createdAt, {
+    message: "La fecha límite debe ser posterior a la fecha de creación",
+    path: ["dueDate"], // el error se asocia a dueDate
+  })
 });

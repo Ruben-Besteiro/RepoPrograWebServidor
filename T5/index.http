@@ -18,6 +18,20 @@ Content-Type: application/json
 DELETE {{apiUrl}}tareas/0
 
 
+### Añadir usuario
+POST {{apiUrl}}users
+Content-Type: application/json
+
+{
+    "name": "Willyrex",
+    "email": "willyrex@proton.me",
+    "password": "contraseña",
+    "role": "user",
+    "avatar": "?",
+    "isActive": true
+}
+
+
 ### Editar tarea
 PUT {{apiUrl}}tareas/1
 Content-Type: application/json
@@ -31,7 +45,6 @@ Content-Type: application/json
     "dueDate": 999,
     "tags": ["nada"]
 }
-
 
 ### Editar tarea parcialmente
 PATCH {{apiUrl}}tareas/1

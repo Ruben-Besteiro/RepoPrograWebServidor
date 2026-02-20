@@ -1,6 +1,6 @@
 // src/controllers/tareas.controller.js
 import { tareas } from '../data/tareas.js';
-//import { ApiError } from '../middleware/errorHandler.js';
+import { ApiError } from '../middleware/errorHandler.js';
 
 // En tareas.routes.js definimos cuándo se llama a estas funciones (endpoints)
 // Este script se encarga de la lógica de cada endpoint
@@ -77,7 +77,7 @@ export const getById = (req, res) => {
   const tarea = tareas.find(c => c.id === id);
   
   if (!tarea) {
-    //throw ApiError.notFound(`Tarea con ID ${id} no encontrada`);
+    throw ApiError.notFound(`Tarea con ID ${id} no encontrada`);
   }
   
   res.json(tarea);
