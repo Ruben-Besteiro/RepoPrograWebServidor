@@ -54,6 +54,8 @@ const userSchema = new mongoose.Schema(
 userSchema.index({ role: 1, isActive: 1 });
 
 // Ocultar password al convertir a JSON
+// Esto se llamaría por ejemplo cada vez que el cliente quiera acceder a Mongo
+// Se llama automáticamente cada vez que convertimos un objeto de Mongo a JSON
 userSchema.methods.toJSON = function() {
   const user = this.toObject();
   delete user.password;

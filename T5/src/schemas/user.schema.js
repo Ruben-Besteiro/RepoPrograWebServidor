@@ -7,7 +7,7 @@ export const createUserSchema = z.object({
     email: z.string(),
     password: z.string(),
     role: z.string(),
-    avatar: z.string(),
+    avatar: z.string().optional(),
     isActive: z.boolean(),
   })
 });

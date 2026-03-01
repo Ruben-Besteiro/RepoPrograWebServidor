@@ -14,13 +14,15 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 // Archivos estáticos
-app.use('/uploads', express.static('storage'));
+app.use('/uploads', express.static('storage'));     // Cuando el usuario mete uploads en la URL, se mete en la carpeta storage del servidor
+
+
 
 // Health check
 app.get('/health', (req, res) => {
-  res.json({ 
-    status: 'ok', 
-    timestamp: new Date().toISOString() 
+  res.json({
+    status: 'ok',
+    timestamp: new Date().toISOString()
   });
 });
 
@@ -35,6 +37,7 @@ app.use(errorHandler);
 const PORT = process.env.PORT || 3000;
 
 const startServer = async () => {
+  console.log("Intentando conectar a:", process.env.DB_URI);
   await dbConnect();
   app.listen(PORT, () => {
     console.log(`🚀 Servidor en http://localhost:${PORT}`);

@@ -1,16 +1,19 @@
 // src/config/db.js
 import mongoose from 'mongoose';
+import dns from 'dns';
+
+dns.setServers(['8.8.8.8', '8.8.4.4']);   // Esto de aquí es obligatorio para resolver el problema del ECONNREFUSED
 
 const dbConnect = async () => {
-  const DB_URI = process.env.DB_URI;
+  const DATABASE_URI = process.env.DB_URI;
   
-  if (!DB_URI) {
+  if (!DATABASE_URI) {
     console.error('❌ DB_URI no está definida en .env');
     process.exit(1);
   }
   
   try {
-    await mongoose.connect(DB_URI);
+    await mongoose.connect(DATABASE_URI);
     console.log('✅ Conectado a MongoDB');
   } catch (error) {
     console.error('❌ Error conectando a MongoDB:', error.message);

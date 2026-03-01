@@ -18,6 +18,7 @@ Content-Type: application/json
 DELETE {{apiUrl}}tareas/0
 
 
+// Esto primero valida con Zod en el Schema, 
 ### Añadir usuario
 POST {{apiUrl}}users
 Content-Type: application/json
@@ -67,3 +68,128 @@ GET {{apiUrl}}tareas/999
 // El app.js llama a app.use('/api', routes), que llama a routes/index.js;
 // La ruta está despiezada, es decir, de /api/usuarios pasa a solo /usuarios.
 // Y el routes/index.js llama a router.use('/usuarios', usuariosRoutes);
+
+
+
+
+### Crear una peli
+POST {{apiUrl}}movies
+Content-Type: application/json
+
+{
+    "title": "ÑÑÑÑÑÑÑ",
+    "director": "John Lasseter",
+    "year": 2011,
+    "genre": "action",
+    "availableCopies": 5,
+    "timesRented": 0,
+    "cover": "uploads/ai.png"
+}
+
+
+### Crear una peli no válida
+POST {{apiUrl}}movies
+Content-Type: application/json
+
+{
+    "title": "Cars 4",
+    "director": "Tomás Turbado",
+    "year": 9999,
+    "genre": "action",
+    "availableCopies": 5,
+    "timesRented": 0,
+    "cover": "uploads/channels4_profile.jpg"
+}
+
+
+### Alquilar una peli
+PATCH {{apiUrl}}movies/1/rent
+Content-Type: application/json
+
+{
+    // No hace falta meter nada aquí dentro
+}
+
+### Devolver una peli
+PATCH {{apiUrl}}movies/1/return
+Content-Type: application/json
+
+{
+    // Aquí igual XD
+}
+
+
+### Pillar una peli
+GET {{apiUrl}}movies/1
+
+### Borrar una peli
+DELETE {{apiUrl}}movies/5
+
+
+### Pillar la portada solamente de una peli
+GET {{apiUrl}}movies/1/cover
+
+
+### Subir una foto de un cuchillo untando manteca en un pan
+POST {{apiUrl}}storage
+Content-Type: multipart/form-data; boundary=----WebKitFormBoundary7MA4YWxkTrZu0gW
+
+------WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="cover"; filename="imagen.jpg"
+Content-Type: image/jpeg
+
+# Aquí va la ruta a la foto
+< ./uploads/channels4_profile.jpg
+------WebKitFormBoundary7MA4YWxkTrZu0gW--
+
+
+### Subir una foto guapísima de un holograma que dice Artificial Intelligence
+POST {{apiUrl}}storage
+Content-Type: multipart/form-data; boundary=----WebKitFormBoundary7MA4YWxkTrZu0gW
+
+------WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="cover"; filename="imagen.png"
+Content-Type: image/png
+
+< ./uploads/ai.png
+------WebKitFormBoundary7MA4YWxkTrZu0gW--
+
+### Pillar una foto
+GET {{apiUrl}}storage/1
+
+
+### Borrar una foto
+DELETE {{apiUrl}}storage/2
+
+
+### Asignar una foto a una peli
+PATCH {{apiUrl}}movies/1/cover
+Content-Type: application/json
+
+{
+    "cover": "uploads/ai.png"
+}
+
+
+### Pillar las 5 pelis más alquiladas
+GET {{apiUrl}}movies/stats/top
+
+{
+}
+
+
+
+### Pillar las pelis con copias disponibles
+GET {{apiUrl}}movies/available
+
+{
+}
+
+
+### Ponerle un rating a una peli
+PATCH {{apiUrl}}movies/1/rate
+Content-Type: application/json
+
+{
+    "rating": 0
+}

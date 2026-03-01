@@ -44,6 +44,10 @@ export const getUser = async (req, res) => {
 };
 
 // POST /api/users
+// User.create(req.body) es un atajo de lo siguiente:
+// const doc = new User(req.body);    Aquí es donde se crea el objeto con parámetros validando el schema que hay en el archivo model
+// await doc.save();      Y aquí es donde se mete en mongo
+// return doc;
 export const createUser = async (req, res) => {
   const user = await User.create(req.body);
   res.status(201).json({ data: user });
