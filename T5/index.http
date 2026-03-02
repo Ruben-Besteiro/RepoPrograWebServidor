@@ -77,7 +77,7 @@ POST {{apiUrl}}movies
 Content-Type: application/json
 
 {
-    "title": "ÑÑÑÑÑÑÑ",
+    "title": "EE",
     "director": "John Lasseter",
     "year": 2011,
     "genre": "action",
@@ -101,6 +101,12 @@ Content-Type: application/json
     "cover": "uploads/channels4_profile.jpg"
 }
 
+### Pillar solamente las pelis de acción por ejemplo
+GET {{apiUrl}}movies?genre=action
+Content-Type: application/json
+
+{
+}
 
 ### Alquilar una peli
 PATCH {{apiUrl}}movies/1/rent

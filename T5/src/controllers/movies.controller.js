@@ -7,16 +7,6 @@ import { handleHttpError } from '../utils/handleError.js';
 
 const PUBLIC_URL = process.env.PUBLIC_URL || 'http://localhost:3000';
 
-/*router.get('/', getMovies);         // Listarlo todo
-router.get('/:id', getOneMovie);     // Listar una sola peli
-router.post('/', uploadMiddleware.single('file'), createMovie);      // Crear una peli (con subida de archivo)
-router.put('/:id', uploadMiddleware.single('file'), updateMovie);   // Editar una peli (con subida de archivo)
-router.delete('/:id', deleteMovie);     // Borrar una peli
-router.post('/:id/rent', rentMovie);     // Alquilar una peli (edita datos)
-router.post('/:id/return', returnMovie);   // Devolver una peli (edita datos)
-router.patch('/:id/cover', uploadMiddleware.single('file'), updateMovieCover);   // Actualizar solo la portada de una peli
-router.get('/:id/cover', getMovieCover);   // Obtener solo la portada de una peli
-router.get('/stats/top', getTopMovies);   // Obtener las 5 películas más alquiladas*/
 
 // GET /api/movies
 export const getMovies = async (req, res) => {
@@ -65,6 +55,8 @@ export const getOneMovie = async (req, res) => {
     res.json({ data: movie });
 };
 
+
+
 export const getMovieCover = async (req, res) => {
     const { id } = req.params;
 
@@ -96,14 +88,19 @@ export const getMovieCover = async (req, res) => {
 };
 
 
+
 // La diferencia es que en vez de ser un usuario tiene que ser una peli
 export const createMovie = async (req, res) => {
     const movie = await Movie.create(req.body);
     res.status(201).json({ data: movie });
 };
 
+
+
 export const updateMovie = async (req, res) => {
 };
+
+
 
 export const deleteMovie = async (req, res) => {
     const { id } = req.params;
@@ -114,6 +111,8 @@ export const deleteMovie = async (req, res) => {
     }
     res.status(204).send();
 };
+
+
 
 export const rentMovie = async (req, res) => {
     const { id } = req.params;
@@ -133,6 +132,8 @@ export const rentMovie = async (req, res) => {
     res.json({ data: movie });
 };
 
+
+
 export const returnMovie = async (req, res) => {
     const { id } = req.params;
     const movie = await Movie.findById(id);
@@ -148,6 +149,8 @@ export const returnMovie = async (req, res) => {
     await movie.save();
     res.json({ data: movie });
 };
+
+
 
 export const updateMovieCover = async (req, res) => {
     const { id } = req.params;
@@ -186,16 +189,22 @@ export const updateMovieCover = async (req, res) => {
     });
 };
 
+
+
 export const getTopMovies = async (req, res) => {
     // Lo que va dentro del sort es el campo por el que quieres ordenar, y el -1 es para ordenarlo de mayor a menor (si fuera 1 sería de menor a mayor)
     const topMovies = await Movie.find().sort({ timesRented: -1 }).limit(5);
     res.json({ data: topMovies });
 };
 
+
+
 export const getAvailableMovies = async (req, res) => {
     const availableMovies = await Movie.find({ availableCopies: { $gt: 0 } });
     res.json({ data: availableMovies });
 };
+
+
 
 export const updateMovieRating = async (req, res) => {
     const { id } = req.params;
