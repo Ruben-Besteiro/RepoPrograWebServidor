@@ -1,0 +1,119 @@
+@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjoiNjljNTVjOTViYmJmMzA0NDYzYWM5OTIyIiwiaWF0IjoxNzc0NTQxOTczLCJleHAiOjE3NzQ1NDI4NzN9.IEk0_Tl0XzoYVqzraiH1wOgpXxxQn5H4klAWOSnISp8
+@tokenAdmin = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjoiNjljNDBjODUzYmQ3MzNjMjNmNjU5MGY2IiwiaWF0IjoxNzc0NTI1Nzk0LCJleHAiOjE3NzQ1MjY2OTR9.yO422z2NHdyiGmTW8E_ypo4l1BaHkz3ii7gyj7xBlPE
+
+### Registrar usuario normal
+POST http://localhost:3000/api/auth/register
+Content-Type: application/json
+
+{
+    "name": "Juan",
+    "email": "juan@ejemplo.com",
+    "password": "contraseña",
+    "role": "user",
+    "age": 25
+}
+
+### Registrar usuario admin
+POST http://localhost:3000/api/auth/register
+Content-Type: application/json
+
+{
+    "name": "Pol",
+    "email": "pulpo.pol@yopmail.xd",
+    "password": "contraseña",
+    "role": "admin",
+    "age": 67
+}
+
+
+
+### Registrar usuario no válido (debería fallar)
+POST http://localhost:3000/api/auth/register
+Content-Type: application/json
+
+{
+    "name": "Nadie",
+    "email": "emailnovalido",
+    "password": "ñ",
+    "age": -1
+}
+
+### Login
+POST http://localhost:3000/api/auth/login
+Content-Type: application/json
+
+{
+    "email": "juan@ejemplo.com",
+    "password": "contraseña"
+}
+
+### Login admin
+POST http://localhost:3000/api/auth/login
+Content-Type: application/json
+
+{
+    "email": "pulpopol@yopmail.xd",
+    "password": "contraseña"
+}
+
+
+### Obtener usuario actual (necesario estar autenticado)
+GET http://localhost:3000/api/auth/me
+Authorization: Bearer {{token}}
+
+### Añadir podcast (necesario estar autenticado)
+POST http://localhost:3000/api/podcasts
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+    "title": "ÑÑÑ",
+    "description": "No séééééé",
+    "user": "69c3fbe1773596a76e5a0bf5",
+    "category": "tech",
+    "duration": 120,
+    "episodes": 1,
+    "published": false
+}
+
+### Eliminar un podcast (necesario ser admin)
+DELETE http://localhost:3000/api/podcasts/69c3fd012d8156d204b4c840
+Authorization: Bearer {{tokenAdmin}}
+
+
+### Obtener un podcast por ID (debe estar publicado salvo si eres admin)
+GET http://localhost:3000/api/podcasts/69c3fead97b23f884adea45d
+Authorization: Bearer {{tokenAdmin}}
+
+
+### Obtener los podcasts que estén publicados solamente (con paginación)
+GET http://localhost:3000/api/podcasts?page=1&limit=2
+
+
+### Obtener todos los podcasts incluyendo los no publicados (necesario ser admin - con paginación)
+GET http://localhost:3000/api/podcasts/admin/all?page=1&limit=5
+Authorization: Bearer {{tokenAdmin}}
+
+
+### Actualizar un podcast (necesario ser el autor o ser admin)
+PUT http://localhost:3000/api/podcasts/69c2d6bdb99064813d1e46f4
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "title": "Nuevo título actualizado",
+  "description": "Nueva descripción más larga para el podcast...",
+  "duration": 500
+}
+
+
+### Publicar un podcast (necesario ser admin)
+PATCH http://localhost:3000/api/podcasts/69c3fead97b23f884adea45d/publish
+Content-Type: application/json
+Authorization: Bearer {{tokenAdmin}}
+
+
+### Despublicar un podcast (necesario ser admin)
+PATCH http://localhost:3000/api/podcasts/69c3fead97b23f884adea45d/unpublish
+Content-Type: application/json
+Authorization: Bearer {{tokenAdmin}}

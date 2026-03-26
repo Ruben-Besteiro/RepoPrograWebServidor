@@ -6,6 +6,7 @@
     "node": ">=20.11.0"
   },
   "dependencies": {
+    "@prisma/client": "^7.5.0",
     "@slack/webhook": "^7.0.8",
     "bcryptjs": "^3.0.3",
     "cors": "^2.8.6",
@@ -25,8 +26,12 @@
     "zod": "^4.3.6"
   },
   "scripts": {
+    "dev": "node --watch src/app.js",
     "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js --forceExit --detectOpenHandles",
     "test:watch": "npm test -- --watch",
     "test:coverage": "npm test -- --coverage"
+  },
+  "devDependencies": {
+    "prisma": "^7.5.0"
   }
 }

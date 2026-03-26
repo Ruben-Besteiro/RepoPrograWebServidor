@@ -25,6 +25,7 @@
     "zod": "^4.3.6"
   },
   "scripts": {
+    "dev": "node --watch src/app.js",
     "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js --forceExit --detectOpenHandles",
     "test:watch": "npm test -- --watch",
     "test:coverage": "npm test -- --coverage"

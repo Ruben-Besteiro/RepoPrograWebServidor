@@ -27,6 +27,7 @@ export const updateMovieSchema = z.object({
     copies: z.number().default(5),
     availableCopies: z.number().default(5),
     timesRented: z.number().default(0),
+    rating: z.number().min(0).max(10).optional(),
     cover: z.string().optional()
   })
 });

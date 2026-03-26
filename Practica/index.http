@@ -1,0 +1,70 @@
+@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2OWI5OTQ4ZDcyODU1M2ViZGNhN2U4NTciLCJpYXQiOjE3NzM3Njk4NjksImV4cCI6MTc3Mzc3MDc2OX0.GWC8krll_aw2n4vsnE9PPCZBu9RpjMFTM1nUeZFBG0g
+// El token debe ir arriba
+
+### Registrar usuario (devuelve los tokens)
+POST http://localhost:3000/api/auth/register
+Content-Type: application/json
+
+{
+    "email": "willyrex@gmail.com",
+    "password": "QueVivaElMaincra69@",
+    "name": "Willy",
+    "lastName": "Rex",
+    "nif": "E",
+    "role": "admin",
+    "company": "Planeta Vegetta",
+    "address": {
+        "street": "Ñ",
+        "number": 0,
+        "postal": 69696,
+        "city": "Madrid",
+        "province": "Madrid"
+    }
+}
+
+### Login (devuelve los tokens)
+### No es necesario que exista el access token
+POST http://localhost:3000/api/auth/login
+Content-Type: application/json
+
+{
+    "email": "willyrex@gmail.com",
+    "password": "QueVivaElMaincra69@"
+}
+
+
+### Login no válido
+POST http://localhost:3000/api/auth/login
+Content-Type: application/json
+
+{
+    "email": "willyrex@gmail.com",
+    "password": "incorrecta"
+}
+
+### Obtener usuarios (ruta protegida)
+GET http://localhost:3000/api/user
+Authorization: Bearer {{token}}
+
+### Obtener usuarios sin token (debe dar 401)
+GET http://localhost:3000/api/user
+
+### REFRESH TOKEN (genera nuevo accessToken)
+POST http://localhost:3000/api/auth/refresh
+Content-Type: application/json
+
+{
+    "refreshToken": "{{token}}"
+}
+
+### LOGOUT (revoca refresh token)
+POST http://localhost:3000/api/auth/logout
+Content-Type: application/json
+
+{
+    "refreshToken": "{{token}}"
+}
+
+### CERRAR TODAS LAS SESIONES (necesita accessToken)
+POST http://localhost:3000/api/auth/logout-all
+Authorization: Bearer {{token}}

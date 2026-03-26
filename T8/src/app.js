@@ -6,9 +6,9 @@ import routes from './routes/index.js';
 import 'dotenv/config';
 import { errorHandler, notFound } from './middleware/error.middleware.js';
 import swaggerUi from 'swagger-ui-express';
-import swaggerSpecs from './docs/swagger.js';
+import swaggerSpecs from './api-docs/swagger.js';
 import morganBody from 'morgan-body';
-import { loggerStream } from './utils/handleLogger.js';
+import { loggerStream } from './utils/handleSlack.js';
 
 const app = express();
 
