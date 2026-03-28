@@ -1,0 +1,180 @@
+@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjoxLCJpYXQiOjE3NzQ3MTkyMzh9.CwLg1JOdC9d2n6kL3rvqBaXQf7WxDKda0g3S7BKCPj8
+@tokenLibrarian = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjoyLCJpYXQiOjE3NzQ3MTkzMDB9.gOlo8L_oEHZWKysGb3sLg9X_sJUD3vWXTleJSAAqHR0
+@tokenAdmin = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjozLCJpYXQiOjE3NzQ3MDE4MzEsImV4cCI6MTc3NDcwMjczMX0.JJ0tBi1lSLzweQcMZQc-8JOXPFDk79SPy7jqhv78dyM
+
+### Registrar usuario normal
+POST http://localhost:3000/api/auth/register
+Content-Type: application/json
+
+{
+    "name": "Juan",
+    "email": "juan@ejemplo.com",
+    "password": "contraseña",
+    "role": "USER"
+}
+
+### Registrar usuario librarian
+POST http://localhost:3000/api/auth/register
+Content-Type: application/json
+
+{
+    "name": "Librarian",
+    "email": "librarian@librarian.com",
+    "password": "contraseña",
+    "role": "LIBRARIAN"
+}
+
+### Registrar usuario admin
+POST http://localhost:3000/api/auth/register
+Content-Type: application/json
+
+{
+    "name": "Admin",
+    "email": "admin@admin.com",
+    "password": "contraseña",
+    "role": "ADMIN"
+}
+
+### Login usuario normal
+POST http://localhost:3000/api/auth/login
+Content-Type: application/json
+
+{
+    "email": "juan@ejemplo.com",
+    "password": "contraseña"
+}
+
+### Login usuario librarian
+POST http://localhost:3000/api/auth/login
+Content-Type: application/json
+
+{
+    "email": "librarian@librarian.com",
+    "password": "contraseña"
+}
+
+### Login usuario admin
+POST http://localhost:3000/api/auth/login
+Content-Type: application/json
+
+{
+    "email": "admin@admin.com",
+    "password": "contraseña"
+}
+
+### Me
+GET http://localhost:3000/api/auth/me
+//Authorization: Bearer {{token}}
+//Authorization: Bearer {{tokenLibrarian}}
+Authorization: Bearer {{tokenAdmin}}
+
+
+### Obtener todos los libros
+GET http://localhost:3000/api/books
+Authorization: Bearer {{token}}
+
+### Obtener un libro por ID
+GET http://localhost:3000/api/books/1
+Authorization: Bearer {{token}}
+
+### Crear un libro (necesario ser librarian o admin)
+POST http://localhost:3000/api/books
+Content-Type: application/json
+Authorization: Bearer {{tokenLibrarian}}
+
+{
+    "isbn": "999-9-99-99999-9",
+    "title": "Luna de Plutón",
+    "author": "Dross",
+    "genre": "Novela",
+    "description": "Ni idea XD",
+    "publishedYear": 2015,
+    "copies": 10,
+    "availableCopies": 10
+}
+
+### Actualizar un libro (necesario ser librarian o admin)
+PUT http://localhost:3000/api/books/1
+Content-Type: application/json
+Authorization: Bearer {{tokenLibrarian}}
+
+{
+    "title": "Wigetta 2",
+    "author": "Willyrex y Vegetta",
+    "genre": "Novela",
+    "description": "La secuela del mejor libro jamás hecho",
+    "publishedYear": 2015
+}
+
+### Eliminar un libro (necesario ser admin)
+DELETE http://localhost:3000/api/books/1
+Authorization: Bearer {{tokenAdmin}}
+
+
+### Solicitar un préstamo
+POST http://localhost:3000/api/loans
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+    "bookId": 2,
+    "loanDate": "2022-01-01",
+    "dueDate": "2022-01-15",
+    "returnedDate": null,
+    "status": "PENDING"
+}
+
+### Obtener todos los préstamos del usuario que es el dueño del token
+GET http://localhost:3000/api/loans
+Authorization: Bearer {{token}}
+
+### Obtener todos los préstamos de todos los usuarios (necesario ser librarian o admin)
+GET http://localhost:3000/api/loans/all
+Authorization: Bearer {{tokenLibrarian}}
+
+### Devolver un préstamo
+PUT http://localhost:3000/api/loans/1/return
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+    "returnedDate": "2022-01-10",
+    "status": "RETURNED"
+}
+
+
+### Obtener todas las reseñas de un libro
+GET http://localhost:3000/api/books/1/reviews
+Authorization: Bearer {{token}}
+
+### Obtener una reseña por ID
+GET http://localhost:3000/api/books/1/reviews
+Authorization: Bearer {{token}}
+
+### Crear una reseña
+POST http://localhost:3000/api/books/1/reviews
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+    "bookId": 1,
+    "userId": 1,
+    "rating": 5,
+    "comment": "Excelente libro"
+}
+
+### Actualizar una reseña
+PUT http://localhost:3000/api/books/1/reviews
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+    "bookId": 1,
+    "userId": 1,
+    "rating": 1,
+    "comment": "Mierdón de libro"
+}
+
+### Eliminar una reseña
+DELETE http://localhost:3000/api/books/1/reviews
+Authorization: Bearer {{token}}

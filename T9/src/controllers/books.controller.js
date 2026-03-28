@@ -1,0 +1,87 @@
+// src/controllers/books.controller.js
+import { prisma } from '../config/db.js';
+
+export const createBookCtrl = async (req, res) => {
+    try {
+        const { isbn, title, author, genre, description, publishedYear, copies, availableCopies } = req.body;
+        const book = await prisma.book.create({
+            data: {
+                isbn,
+                title,
+                author,
+                genre,
+                description,
+                publishedYear,
+                copies,
+                availableCopies
+            }
+        });
+        res.status(201).json(book);
+    } catch (error) {
+        console.error('Error creating book:', error);
+        res.status(500).json({ error: `ERROR: Error al crear el libro: ${error.message}` });
+    }
+};
+
+export const getAllBooksCtrl = async (req, res) => {
+    try {
+        const books = await prisma.book.findMany();
+        res.status(200).json(books);
+    } catch (error) {
+        console.error('Error getting books:', error);
+        res.status(500).json({ error: `ERROR: Error al obtener los libros: ${error.message}` });
+    }
+};
+
+export const getBookCtrl = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const book = await prisma.book.findUnique({
+            where: { id: parseInt(id) }
+        });
+        if (!book) {
+            return res.status(404).json({ error: 'ERROR: Libro no encontrado' });
+        }
+        res.status(200).json(book);
+    } catch (error) {
+        console.error('Error getting book:', error);
+        res.status(500).json({ error: `ERROR: Error al obtener el libro: ${error.message}` });
+    }
+};
+
+export const updateBookCtrl = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { isbn, title, author, genre, description, publishedYear, copies, availableCopies } = req.body;
+        const book = await prisma.book.update({
+            where: { id: parseInt(id) },
+            data: {
+                isbn,
+                title,
+                author,
+                genre,
+                description,
+                publishedYear,
+                copies,
+                availableCopies
+            }
+        });
+        res.status(200).json(book);
+    } catch (error) {
+        console.error('Error updating book:', error);
+        res.status(500).json({ error: `ERROR: Error al actualizar el libro: ${error.message}` });
+    }
+};
+
+export const deleteBookCtrl = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const book = await prisma.book.delete({
+            where: { id: parseInt(id) }
+        });
+        res.status(200).json(book);
+    } catch (error) {
+        console.error('Error deleting book:', error);
+        res.status(500).json({ error: `ERROR: Error al eliminar el libro: ${error.message}` });
+    }
+};

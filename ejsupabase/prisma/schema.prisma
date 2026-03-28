@@ -16,7 +16,7 @@ datasource db {
 
 // prisma/schema.prisma
 
-model User {
+/*model User {
   id        Int      @id @default(autoincrement())
   email     String   @unique
   name      String
@@ -80,5 +80,30 @@ model Category {
 enum Role {
   USER
   AUTHOR
+  ADMIN
+}*/
+
+
+
+
+
+
+model User {
+  id        Int      @id @default(autoincrement())
+  email     String   @unique
+  name      String
+  password  String
+  role      Role     @default(USER)
+
+  // Relaciones
+  loans     Loan[]
+  reviews   Review[]
+
+  @@map("users")
+}
+
+enum Role {
+  USER
+  LIBRARIAN
   ADMIN
 }

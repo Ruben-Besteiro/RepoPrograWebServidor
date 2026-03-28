@@ -1,0 +1,95 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Configuración del generador (cliente)
+generator client {
+  provider = "prisma-client-js"
+}
+
+
+
+// Configuración de la base de datos
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+}
+
+
+// Aquí van tus modelos...
+
+// prisma/schema.prisma
+
+model User {
+  id        Int      @id @default(autoincrement())
+  email     String   @unique
+  name      String
+  password  String
+  role      Role     @default(USER)
+
+  // Relaciones
+  loans     Loan[]
+  reviews   Review[]
+
+  @@map("users")
+}
+
+enum Role {
+  USER
+  LIBRARIAN
+  ADMIN
+}
+
+model Book {
+  id              Int       @id @default(autoincrement())
+  isbn            String    @unique
+  title           String
+  author          String
+  genre           String
+  description     String?
+  publishedYear   Int?
+  copies          Int
+  availableCopies Int
+
+  // Relaciones
+  loans           Loan[]
+  reviews         Review[]
+
+  @@map("books")
+}
+
+model Loan {
+  id          Int      @id @default(autoincrement())
+  loanDate    DateTime @default(now())
+  dueDate     DateTime
+  returnDate  DateTime?
+  status      LoanStatus @default(ACTIVE)
+
+  // FKs
+  book        Book     @relation(fields: [bookId], references: [id])
+  bookId      Int
+  user        User     @relation(fields: [userId], references: [id])
+  userId      Int
+
+  @@map("loans")
+}
+
+enum LoanStatus {
+  ACTIVE
+  RETURNED
+  OVERDUE
+}
+
+model Review {
+  id        Int      @id @default(autoincrement())
+  rating    Int      @db.SmallInt  // 1-5
+  comment   String?
+  createdAt DateTime @default(now())
+
+  // FKs
+  book      Book     @relation(fields: [bookId], references: [id])
+  bookId    Int
+  user      User     @relation(fields: [userId], references: [id])
+  userId    Int
+
+  @@map("reviews")
+}
