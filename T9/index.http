@@ -7,8 +7,8 @@ POST http://localhost:3000/api/auth/register
 Content-Type: application/json
 
 {
-    "name": "Willyrex",
-    "email": "willyrex@ejemplo.com",
+    "name": "AAAAAAAAAAAAAAAAA",
+    "email": "aaaaaaaaaaaaaaaa@ejemplo.com",
     "password": "contraseña",
     "role": "USER"
 }
@@ -18,8 +18,8 @@ POST http://localhost:3000/api/auth/register
 Content-Type: application/json
 
 {
-    "name": "Librarian",
-    "email": "librarian@librarian.com",
+    "name": "ddcsfghnkdgfvhnnhdgfvhndgfv",
+    "email": "ddcsfghnkdgfvhnnhdgfvhndgfv@ejemplo.com",
     "password": "contraseña",
     "role": "LIBRARIAN"
 }
@@ -29,8 +29,8 @@ POST http://localhost:3000/api/auth/register
 Content-Type: application/json
 
 {
-    "name": "Admin",
-    "email": "admin@admin.com",
+    "name": "erevghuinoewgrhunioecwgrnegrvhuiyn",
+    "email": "erevghuinoewgrhunioecwgrnegrvhuiyn@ejemplo.com",
     "password": "contraseña",
     "role": "ADMIN"
 }
@@ -58,7 +58,7 @@ POST http://localhost:3000/api/auth/login
 Content-Type: application/json
 
 {
-    "email": "admin@admin.com",
+    "email": "admin2@admin.com",
     "password": "contraseña"
 }
 

@@ -2,7 +2,7 @@
 import { prisma } from '../config/prisma.js';
 import { generateAccessToken } from '../utils/handleJwt.js';
 import bcrypt from 'bcryptjs';
-import jwt from 'jsonwebtoken';
+import { sendSlackMessage } from '../utils/handleSlack.js';
 
 const registerCtrl = async (req, res) => {
     try {
@@ -20,6 +20,7 @@ const registerCtrl = async (req, res) => {
         });
         const token = generateAccessToken(user);
         const { password: _, ...userWithoutPassword } = user;
+        await sendSlackMessage(`*Nuevo usuario registrado*\n\n*Nombre:* ${user.name}\n*Rol:* ${user.role}\n*ID:* ${user.id}`);
         res.status(201).json({ user: userWithoutPassword, token });
     } catch (error) {
         res.status(500).json({ error: `ERROR: ${error.message}` });

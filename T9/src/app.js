@@ -6,6 +6,7 @@ import dbConnect from './config/prisma.js';
 import routes from './routes/index.js';
 import { errorHandler, notFound } from './middleware/error.middleware.js';
 import morganBody from 'morgan-body';
+import { loggerStream } from './utils/handleSlack.js';
 import swaggerUi from 'swagger-ui-express';
 import swaggerSpecs from './config/swagger.js';
 
@@ -15,6 +16,13 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+
+// Morgan Body - Para reportar errores a Slack
+morganBody(app, {
+  noColors: true,
+  stream: loggerStream,
+  skip: (req, res) => res.statusCode < 400
+});
 
 // Health check
 app.get('/health', (req, res) => {
