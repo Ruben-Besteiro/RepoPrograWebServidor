@@ -109,3 +109,35 @@ export const deleteBookCtrl = async (req, res) => {
         res.status(500).json({ error: `ERROR: Error al eliminar el libro: ${error.message}` });
     }
 };
+
+export const getMostRentedBooksCtrl = async (req, res) => {
+    try {
+        const { limit = 10 } = req.query;
+        const books = await prisma.book.findMany({
+            orderBy: {
+                timesRented: 'desc'
+            },
+            take: parseInt(limit)
+        });
+        res.status(200).json(books);
+    } catch (error) {
+        console.error('Error getting most rented books:', error);
+        res.status(500).json({ error: `ERROR: Error al obtener los libros más alquilados: ${error.message}` });
+    }
+};
+
+export const getBestRatedBooksCtrl = async (req, res) => {
+    try {
+        const { limit = 10 } = req.query;
+        const books = await prisma.book.findMany({
+            orderBy: {
+                avgReview: 'desc'
+            },
+            take: parseInt(limit)
+        });
+        res.status(200).json(books);
+    } catch (error) {
+        console.error('Error getting best rated books:', error);
+        res.status(500).json({ error: `ERROR: Error al obtener los libros mejor valorados: ${error.message}` });
+    }
+};

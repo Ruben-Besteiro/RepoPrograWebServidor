@@ -57,7 +57,10 @@ export const createLoanCtrl = async (req, res) => {
             }),
             prisma.book.update({
                 where: { id: parseInt(bookId) },
-                data: { availableCopies: { decrement: 1 } }
+                data: {
+                    availableCopies: { decrement: 1 },
+                    timesRented: { increment: 1 }
+                }
             })
         ]);
 

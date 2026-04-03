@@ -1,10 +1,13 @@
 // src/routes/books.routes.js
 import { Router } from 'express';
 import authMiddleware, { checkRole, middlewareBook, middlewareReview } from '../middleware/auth.middleware.js';
-import { createBookCtrl, getAllBooksCtrl, getBookCtrl, updateBookCtrl, deleteBookCtrl } from '../controllers/books.controller.js';
+import { createBookCtrl, getAllBooksCtrl, getBookCtrl, updateBookCtrl, deleteBookCtrl, getMostRentedBooksCtrl, getBestRatedBooksCtrl } from '../controllers/books.controller.js';
 import { getReviewsCtrl, createReviewCtrl, deleteReviewCtrl } from '../controllers/reviews.controller.js';
 
 const router = Router();
+
+// En cuanto al orden de las rutas, es importante que las que tienen :id vayan abajo
+// Las rutas más específicas van arriba y las más generales van abajo
 
 /**
  * @openapi
@@ -74,6 +77,44 @@ router.post('/', authMiddleware, checkRole(['LIBRARIAN', 'ADMIN']), middlewareBo
  *               $ref: '#/components/schemas/PaginatedResponse'
  */
 router.get('/', getAllBooksCtrl);
+
+/**
+ * @openapi
+ * /api/books/most-rented:
+ *   get:
+ *     tags:
+ *       - Books
+ *     summary: "Obtener los N libros más alquilados"
+ *     parameters:
+ *       - in: query
+ *         name: limit
+ *         required: true
+ *         schema:
+ *           type: integer
+ *     responses:
+ *       200:
+ *         description: "Lista de libros"
+ */
+router.get('/most-rented', getMostRentedBooksCtrl);
+
+/**
+ * @openapi
+ * /api/books/best-rated:
+ *   get:
+ *     tags:
+ *       - Books
+ *     summary: "Obtener los N libros mejor valorados"
+ *     parameters:
+ *       - in: query
+ *         name: limit
+ *         required: true
+ *         schema:
+ *           type: integer
+ *     responses:
+ *       200:
+ *         description: "Lista de libros"
+ */
+router.get('/best-rated', getBestRatedBooksCtrl);
 
 /**
  * @openapi

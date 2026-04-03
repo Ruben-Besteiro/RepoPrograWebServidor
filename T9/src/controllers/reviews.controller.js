@@ -27,6 +27,16 @@ export const createReviewCtrl = async (req, res) => {
                 comment
             }
         });
+
+        // Actualizar la media de reseñas del libro
+        const reviews = await prisma.review.findMany({
+            where: { bookId: parseInt(bookId) }
+        });
+        const avgReview = reviews.reduce((acc, review) => acc + review.rating, 0) / reviews.length;
+        await prisma.book.update({
+            where: { id: parseInt(bookId) },
+            data: { avgReview }
+        });
         res.status(201).json(review);
     } catch (error) {
         if (error.code === 'P2002') {

@@ -124,7 +124,7 @@ Authorization: Bearer {{tokenAdmin}}
 ### Solicitar un préstamo
 POST http://localhost:3000/api/loans
 Content-Type: application/json
-Authorization: Bearer {{token}}
+Authorization: Bearer {{tokenLibrarian}}
 
 {
     "bookId": 12,
@@ -143,7 +143,7 @@ GET http://localhost:3000/api/loans/all
 Authorization: Bearer {{tokenLibrarian}}
 
 ### Devolver un préstamo
-PUT http://localhost:3000/api/loans/1/return
+PUT http://localhost:3000/api/loans/37/return
 Content-Type: application/json
 Authorization: Bearer {{token}}
 
@@ -157,9 +157,9 @@ Authorization: Bearer {{token}}
 GET http://localhost:3000/api/books/1/reviews
 
 ### Crear una reseña para el libro 1 del usuario que tiene el token
-POST http://localhost:3000/api/books/1/reviews
+POST http://localhost:3000/api/books/12/reviews
 Content-Type: application/json
-Authorization: Bearer {{token}}
+Authorization: Bearer {{tokenLibrarian}}
 
 {
     "rating": 5,
@@ -179,3 +179,10 @@ Authorization: Bearer {{token}}
 ### Eliminar una reseña
 DELETE http://localhost:3000/api/reviews/1
 Authorization: Bearer {{token}}
+
+
+### Obtener los N libros más alquilados
+GET http://localhost:3000/api/books/most-rented?limit=5
+
+### Obtener los N libros mejor valorados
+GET http://localhost:3000/api/books/best-rated?limit=5
