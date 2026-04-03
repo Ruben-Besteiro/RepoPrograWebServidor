@@ -91,5 +91,6 @@ model Review {
   user      User     @relation(fields: [userId], references: [id])
   userId    Int
 
+  @@unique([userId, bookId])    // Con esto impedimos que un usuario pueda hacer más de una reseña por libro
   @@map("reviews")
 }

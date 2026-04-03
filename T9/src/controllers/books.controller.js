@@ -1,5 +1,5 @@
 // src/controllers/books.controller.js
-import { prisma } from '../config/db.js';
+import { prisma } from '../config/prisma.js';
 
 export const createBookCtrl = async (req, res) => {
     try {
@@ -25,8 +25,32 @@ export const createBookCtrl = async (req, res) => {
 
 export const getAllBooksCtrl = async (req, res) => {
     try {
-        const books = await prisma.book.findMany();
-        res.status(200).json(books);
+        // Paginación
+        const { genre, author, page = 1, limit = 10 } = req.query;
+        const skip = (parseInt(page) - 1) * parseInt(limit);
+        const take = parseInt(limit);
+
+        const query = {};
+        if (genre) query.genre = genre;
+        if (author) query.author = author;
+
+        // Consultar total de libros con el filtro aplicado
+        const total = await prisma.book.count({ where: query });
+        const books = await prisma.book.findMany({
+            where: query,
+            skip,
+            take
+        });
+
+        res.status(200).json({
+            data: books,
+            meta: {
+                total,
+                page: parseInt(page),
+                limit: parseInt(limit),
+                totalPages: Math.ceil(total / limit)
+            }
+        });
     } catch (error) {
         console.error('Error getting books:', error);
         res.status(500).json({ error: `ERROR: Error al obtener los libros: ${error.message}` });

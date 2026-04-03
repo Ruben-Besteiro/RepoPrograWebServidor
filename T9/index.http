@@ -1,14 +1,14 @@
-@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjoxLCJpYXQiOjE3NzQ3MTkyMzh9.CwLg1JOdC9d2n6kL3rvqBaXQf7WxDKda0g3S7BKCPj8
+@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjoxNSwiaWF0IjoxNzc1MDYyMTU0fQ.bPcam6S2-QGWnfWWwEVNEyOUjeATlFDVjIT5v6WabFY
 @tokenLibrarian = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjoyLCJpYXQiOjE3NzQ3MTkzMDB9.gOlo8L_oEHZWKysGb3sLg9X_sJUD3vWXTleJSAAqHR0
-@tokenAdmin = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjozLCJpYXQiOjE3NzQ3MDE4MzEsImV4cCI6MTc3NDcwMjczMX0.JJ0tBi1lSLzweQcMZQc-8JOXPFDk79SPy7jqhv78dyM
+@tokenAdmin = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjozLCJpYXQiOjE3NzQ4OTQ0NTJ9.W6Ok7HGLX4jDnBjN3gg21P7g9W6sWh79qVd5MIeXYmM
 
 ### Registrar usuario normal
 POST http://localhost:3000/api/auth/register
 Content-Type: application/json
 
 {
-    "name": "Juan",
-    "email": "juan@ejemplo.com",
+    "name": "Willyrex",
+    "email": "willyrex@ejemplo.com",
     "password": "contraseña",
     "role": "USER"
 }
@@ -69,13 +69,23 @@ GET http://localhost:3000/api/auth/me
 Authorization: Bearer {{tokenAdmin}}
 
 
-### Obtener todos los libros
+### Obtener todos los libros (con paginación por defecto)
 GET http://localhost:3000/api/books
-Authorization: Bearer {{token}}
+
+### Obtener libros (página 2, límite 5)
+GET http://localhost:3000/api/books?page=2&limit=5
+
+### Obtener solo los libros de género "Libro"
+GET http://localhost:3000/api/books?genre=Libro
+
+### Obtener solo los libros hechos por Dross
+GET http://localhost:3000/api/books?author=Dross
+
+### Obtener solo los libros con copias disponibles
+// De momento nada
 
 ### Obtener un libro por ID
 GET http://localhost:3000/api/books/1
-Authorization: Bearer {{token}}
 
 ### Crear un libro (necesario ser librarian o admin)
 POST http://localhost:3000/api/books
@@ -83,11 +93,11 @@ Content-Type: application/json
 Authorization: Bearer {{tokenLibrarian}}
 
 {
-    "isbn": "999-9-99-99999-9",
-    "title": "Luna de Plutón",
+    "isbn": "666-6-66-666666-6",
+    "title": "La Guerra de Ysak",
     "author": "Dross",
-    "genre": "Novela",
-    "description": "Ni idea XD",
+    "genre": "Libro",
+    "description": "No sé",
     "publishedYear": 2015,
     "copies": 10,
     "availableCopies": 10
@@ -117,7 +127,7 @@ Content-Type: application/json
 Authorization: Bearer {{token}}
 
 {
-    "bookId": 2,
+    "bookId": 12,
     "loanDate": "2022-01-01",
     "dueDate": "2022-01-15",
     "returnedDate": null,
@@ -145,20 +155,13 @@ Authorization: Bearer {{token}}
 
 ### Obtener todas las reseñas de un libro
 GET http://localhost:3000/api/books/1/reviews
-Authorization: Bearer {{token}}
 
-### Obtener una reseña por ID
-GET http://localhost:3000/api/books/1/reviews
-Authorization: Bearer {{token}}
-
-### Crear una reseña
+### Crear una reseña para el libro 1 del usuario que tiene el token
 POST http://localhost:3000/api/books/1/reviews
 Content-Type: application/json
 Authorization: Bearer {{token}}
 
 {
-    "bookId": 1,
-    "userId": 1,
     "rating": 5,
     "comment": "Excelente libro"
 }
@@ -169,12 +172,10 @@ Content-Type: application/json
 Authorization: Bearer {{token}}
 
 {
-    "bookId": 1,
-    "userId": 1,
     "rating": 1,
     "comment": "Mierdón de libro"
 }
 
 ### Eliminar una reseña
-DELETE http://localhost:3000/api/books/1/reviews
+DELETE http://localhost:3000/api/reviews/1
 Authorization: Bearer {{token}}
