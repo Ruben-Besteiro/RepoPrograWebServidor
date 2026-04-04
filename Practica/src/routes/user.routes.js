@@ -1,9 +1,44 @@
 import { Router } from 'express';
-import { getAllUsers } from '../controllers/user.controller.js';
+import {
+    getAllUsers,
+    verifyUser,
+    deleteUser,
+    loginUser,
+    registerUser,
+    refreshTokenCtrl,
+    logoutUser,
+    revokeAllTokens,
+    editLogo,
+    restoreUser,
+    getMe,
+    updateUser,
+    onboardUser
+} from '../controllers/user.controller.js';
+import { validate } from '../middleware/validate.middleware.js';
+import { createUserSchema, loginUserSchema, updateUserSchema } from '../validators/user.validator.js';
+import { authMiddleware } from '../middleware/auth.middleware.js';
 
 const router = Router();
 
-// Ruta protegida: necesita token JWT en el header Authorization
-router.get('/', getAllUsers);
+// Rutas Públicas (sin token)
+router.post('/register', validate(createUserSchema), registerUser);
+router.post('/login', validate(loginUserSchema), loginUser);
+router.post('/refresh', refreshTokenCtrl);
+router.put('/', authMiddleware(), validate(updateUserSchema), updateUser);
+
+// Ruta de Verificación (necesita token pero nos saltamos la comprobación de verificación)
+router.put('/verify', authMiddleware(false), verifyUser);
+
+// ???
+router.patch('/company', authMiddleware(), onboardUser);
+router.patch('/logo', authMiddleware(), editLogo);      // Subir el logo de la compañía con Multer
+
+// Rutas Protegidas (necesitan token y estar verificado por defecto)
+router.get('/', authMiddleware(), getAllUsers);
+router.get('/me', authMiddleware(), getMe);
+router.delete('/', authMiddleware(), deleteUser);
+router.put('/restore', authMiddleware(), restoreUser);
+router.post('/logout', authMiddleware(), logoutUser);
+router.post('/logout-all', authMiddleware(), revokeAllTokens);
 
 export default router;

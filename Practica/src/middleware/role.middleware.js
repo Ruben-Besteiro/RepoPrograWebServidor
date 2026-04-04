@@ -1,4 +1,4 @@
-// src/middleware/rol.middleware.js
+// src/middleware/role.middleware.js
 import { handleHttpError } from '../utils/handleError.js';
 
 // Esto se llamará cuando queramos usar un endpoint que requiera un rol específico
@@ -10,7 +10,7 @@ import { handleHttpError } from '../utils/handleError.js';
  */
 const checkRol = (roles) => (req, res, next) => {
     try {
-        // El usuario viene del middleware de autenticación
+        // El usuario viene del middleware de autenticación (authMiddleware)
         const { user } = req;
 
         // Obtener rol del usuario
