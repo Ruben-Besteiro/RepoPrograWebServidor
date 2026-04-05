@@ -10,16 +10,24 @@ export const validate = (schema) => (req, res, next) => {
         });
         next();
     } catch (error) {
-        const errors = error.issues.map(e => ({
-            field: e.path.join('.'),
-            message: e.message
-        }));
+        if (error.issues) {
+            const errors = error.issues.map(e => ({
+                field: e.path.join('.'),
+                message: e.message
+            }));
 
-        res.status(400).json({
-            error: true,
-            message: 'Error de validación',
-            details: errors
-        });
+            res.status(400).json({
+                error: true,
+                message: 'Error de validación',
+                details: errors
+            });
+        } else {
+            res.status(500).json({
+                error: true,
+                message: 'Error interno en la validación',
+                details: error.message || error
+            });
+        }
     }
 };
 

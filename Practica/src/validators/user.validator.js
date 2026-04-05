@@ -43,6 +43,17 @@ export const updateUserSchema = z.object({
     })
 });
 
+// La contraseña no puede ser igual a la anterior
+export const updatePasswordSchema = z.object({
+    body: z.object({
+        oldPassword: z.string().min(1, 'La contraseña actual es obligatoria'),
+        password: z.string().min(8, 'La contraseña debe tener al menos 8 caracteres')
+    }).refine((data) => data.password !== data.oldPassword, {
+        message: 'La contraseña no puede ser igual a la anterior',
+        path: ['password']
+    })
+});
+
 export const updateUserVerificationCodeSchema = z.object({
     body: z.object({
         verificationCode: z.number().int().positive().min(100000).max(999999)

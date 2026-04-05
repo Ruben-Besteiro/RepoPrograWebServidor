@@ -26,17 +26,19 @@ export const registerUser = async (req, res) => {
         // Crear usuario con contraseña cifrada
         const user = await User.create({ ...body, password: hashedPassword, verificationCode: Math.floor(100000 + Math.random() * 900000).toString(), verificationAttempts: 3, role: 'admin', status: 'pending', deleted: false });
 
-        // Generar tokens
-        const accessToken = generateAccessToken(user);
+        // Generar refresh token
         const refreshToken = generateRefreshToken();
 
         // Guardar refresh token en BD
-        await RefreshToken.create({
+        const storedRefreshToken = await RefreshToken.create({
             token: refreshToken,
             user: user._id,
             expiresAt: getRefreshTokenExpiry(),
             createdByIp: req.ip
         });
+
+        // Generar access token vinculado a la sesión
+        const accessToken = generateAccessToken(user, storedRefreshToken._id);
 
         // No devolver la contraseña
         const userObj = user.toObject();
@@ -116,17 +118,17 @@ export const loginUser = async (req, res) => {
             return;
         }
 
-        // Generar tokens
-        const accessToken = generateAccessToken(user);
+        // Generar y guardar refresh token en BD primero
         const refreshToken = generateRefreshToken();
-
-        // Guardar refresh token en BD
-        await RefreshToken.create({
+        const storedRefreshToken = await RefreshToken.create({
             token: refreshToken,
             user: user._id,
             expiresAt: getRefreshTokenExpiry(),
             createdByIp: req.ip
         });
+
+        // Generar access token vinculado a la sesión
+        const accessToken = generateAccessToken(user, storedRefreshToken._id);
 
         // No devolver la contraseña
         const userObj = user.toObject();
@@ -170,6 +172,28 @@ export const updateUser = async (req, res) => {
         res.status(200).json({ data: userObj });
     } catch (err) {
         handleHttpError(res, 'ERROR_UPDATE_USER', 500);
+    }
+}
+
+export const changePassword = async (req, res) => {
+    try {
+        const { password, oldPassword } = req.body;
+        const user = await User.findById(req.user._id);
+        if (!user) {
+            handleHttpError(res, 'USER_NOT_FOUND', 404);
+            return;
+        }
+        const isMatch = await compare(oldPassword, user.password);
+        if (!isMatch) {
+            handleHttpError(res, 'INVALID_PASSWORD', 401);
+            return;
+        }
+        const hashedPassword = await encrypt(password);
+        user.password = hashedPassword;
+        await user.save();
+        res.status(200).json({ message: 'PASSWORD_CHANGED' });
+    } catch (err) {
+        handleHttpError(res, 'ERROR_CHANGE_PASSWORD', 500);
     }
 }
 
@@ -235,17 +259,29 @@ export const refreshTokenCtrl = async (req, res) => {
             return;
         }
 
-        // Generar nuevo access token
-        const newAccessToken = generateAccessToken(storedToken.user);
+        // Mandamos el token viejo a la mierda
+        storedToken.revoked = true;
+        await storedToken.save();
 
-        res.status(200).json({ accessToken: newAccessToken });
+        // Generar nueva pareja de tokens vinculando sus IDs
+        const newRefreshTokenStr = generateRefreshToken();
+        const newSession = await RefreshToken.create({
+            token: newRefreshTokenStr,
+            user: storedToken.user._id,
+            expiresAt: getRefreshTokenExpiry(),
+            createdByIp: req.ip
+        });
+
+        const newAccessToken = generateAccessToken(storedToken.user, newSession._id);
+
+        res.status(200).json({ accessToken: newAccessToken, refreshToken: newRefreshTokenStr });
     } catch (err) {
         handleHttpError(res, 'ERROR_REFRESH_TOKEN', 500);
     }
 };
 
 /**
- * Logout — revoca un refresh token
+ * Logout — revoca los 2 tokens (en realidad solo mata al refresh token pero el access token depende de él para existir)
  */
 export const logoutUser = async (req, res) => {
     try {
@@ -264,8 +300,7 @@ export const logoutUser = async (req, res) => {
         }
 
         // Revocar
-        storedToken.revokedAt = new Date();
-        storedToken.revokedByIp = req.ip;
+        storedToken.revoked = true;
         await storedToken.save();
 
         res.status(200).json({ message: 'SESSION_CLOSED' });
@@ -275,14 +310,14 @@ export const logoutUser = async (req, res) => {
 };
 
 /**
- * Cerrar todas las sesiones del usuario (requiere authMiddleware)
+ * Cerrar todas las sesiones activas
  */
 export const revokeAllTokens = async (req, res) => {
     try {
         // req.user viene del authMiddleware
         await RefreshToken.updateMany(
-            { user: req.user._id, revokedAt: null },
-            { revokedAt: new Date(), revokedByIp: req.ip }
+            { user: req.user._id, revoked: false },
+            { revoked: true }
         );
 
         res.status(200).json({ message: 'ALL_SESSIONS_CLOSED' });
@@ -361,17 +396,22 @@ export const onboardUser = async (req, res) => {
         const { company: companyId } = req.body;
         const user = req.user;
 
-        // Si la compañía existe, se la asignamos al usuario
-        // Pero si no, la creamos con los datos del usuario
         let companyExists = null;
         if (companyId) {
             companyExists = await Company.findById(companyId);
         }
 
+        // Si la compañía existe, metemos al usuario en ella en calidad de guest
         if (companyExists) {
+            // Pero no podemos meter a gente en compañías freelance que no son suyas
+            if (companyExists.isFreelance && companyExists.owner.toString() !== user._id.toString()) {
+                handleHttpError(res, 'COMPANY_IS_FREELANCE', 400);
+                return;
+            }
             user.company = companyExists._id;
             user.role = 'guest';
         } else {
+            // Pero si no existe, creamos una nueva y le ponemos como admin
             const newCompany = await Company.create({
                 name: user.name,
                 cif: user.nif,
@@ -379,6 +419,7 @@ export const onboardUser = async (req, res) => {
                 isFreelance: true,
                 owner: user._id
             });
+            user.role = 'admin';
             user.company = newCompany._id;
         }
 
@@ -394,16 +435,40 @@ export const onboardUser = async (req, res) => {
     }
 };
 
-export const editLogo = async (req, res) => {
+export const inviteUser = async (req, res) => {
     try {
-        const { logo } = req.body;
+        const { email, name, lastName, nif, address } = req.body;
         const user = req.user;
 
-        if (logo) user.company.logo = logo;
+        // Comprobamos que el admin que invita tiene realmente una compañía
+        if (!user.company) {
+            handleHttpError(res, 'USER_HAS_NO_COMPANY', 400);
+            return;
+        }
 
-        await user.save();
-        res.status(200).json({ message: 'LOGO_UPDATED' });
+        // Si el usuario existe, simplemente lo metemos en la compañía del invitador
+        const userExists = await User.findOne({ email });
+        if (userExists) {
+            userExists.company = user.company._id;
+            userExists.role = 'guest';
+            await userExists.save();
+            res.status(200).json({ message: 'USER_INVITED', data: userExists });
+            return;
+        }
+
+        // Si no, lo creamos
+        const newUser = await User.create({
+            email,
+            name,
+            lastName,
+            nif,
+            address,
+            company: user.company._id,
+            role: 'guest'
+        });
+
+        res.status(200).json({ message: 'USER_INVITED_AND_CREATED', data: newUser });
     } catch (err) {
-        handleHttpError(res, 'ERROR_UPDATE_LOGO', 500);
+        handleHttpError(res, 'ERROR_INVITE_USER', 500);
     }
 };

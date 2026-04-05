@@ -1,8 +1,8 @@
-@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2OWQwZTY4ZTkyMmFkYTE2NDY3YTM3OGIiLCJpYXQiOjE3NzUyOTk0ODgsImV4cCI6MTc3NTMwMDM4OH0.7KPc34TDEC7WkieAmMxENO6vpm5bCwWTN8wp02mVdcM
-@refreshToken = f8cb34845747a5c05613ea2b14b6964927d78e4ac5999be8fcef784911a3a3da3c16190ea651223aa5862d6ab3bb84de10818e0ae1ebf1a50b5b5407fe752eb2
+@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2OWQwZTY4ZTkyMmFkYTE2NDY3YTM3OGIiLCJzZXNzaW9uSWQiOiI2OWQyN2FhYTIxOWEzMDBlZjlmYWRkNjAiLCJpYXQiOjE3NzU0MDE2NDMsImV4cCI6MTc3NTQwMjU0M30.KG3eXZ_9YEjCnVkpOgMi-1LlcCis3vQTxI2OdKj3VbA
+@refreshToken = 5f7db270eeb999aabe022fa3d1c0b6f84556684c05a910c0f8fcc73316e296a36406b27d001d2a48180c2084aef11f7fff1059629137401ca8aa054f25b13bd5
 // El token debe ir arriba
 
-### Registrar usuario (hay que verificarlo)
+### Registrar usuario (hay que verificarlo) (por defecto es admin)
 POST http://localhost:3000/api/user/register
 Content-Type: application/json
 
@@ -37,7 +37,7 @@ Content-Type: application/json
 
 {
     "email": "willyrex@gmail.com",
-    "password": "QueVivaElMaincra69@"
+    "password": "vetr7n8y0rvtey7n8cwty7n90wtrvy7n0c8y890ecnrtwy7new0ctv07ecwtnvy8"
 }
 
 ### Actualizar el usuario que tiene el token
@@ -60,14 +60,25 @@ Content-Type: application/json
     }
 }
 
+### Cambiar solo la contraseña de un usuario
+PATCH http://localhost:3000/api/user/password
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+    "oldPassword": "QueVivaElMaincra69@",
+    "password": "vetr7n8y0rvtey7n8cwty7n90wtrvy7n0c8y890ecnrtwy7new0ctv07ecwtnvy8"
+}
+
 ### Meter a un usuario en una compañía
+### Si el ID no existe, crea una compañía freelance
+### Pero si sí existe, el usuario pasa a ser guest
 PATCH http://localhost:3000/api/user/company
 Authorization: Bearer {{token}}
 Content-Type: application/json
 
 {
-    // ID inventado
-    "company": "69d0e7e4d06b8140f7fc6603"
+    "company": "69d0e7e4d06b8140f7fc6609"
 }
 
 ### Obtener usuarios (ruta protegida)
@@ -81,7 +92,7 @@ Authorization: Bearer {{token}}
 ### Obtener usuarios sin token (debe dar 401)
 GET http://localhost:3000/api/user
 
-### REFRESH TOKEN (genera nuevo accessToken)
+### Refrescar el access token
 POST http://localhost:3000/api/user/refresh
 Content-Type: application/json
 
@@ -89,7 +100,7 @@ Content-Type: application/json
     "refreshToken": "{{refreshToken}}"
 }
 
-### LOGOUT (revoca refresh token)
+### Cerrar sesión (manda a tomar por culo ambos tokens)
 POST http://localhost:3000/api/user/logout
 Authorization: Bearer {{token}}
 Content-Type: application/json
@@ -98,7 +109,7 @@ Content-Type: application/json
     "refreshToken": "{{refreshToken}}"
 }
 
-### CERRAR TODAS LAS SESIONES (necesita accessToken)
+### Cerrar todas las sesiones (necesita accessToken)
 POST http://localhost:3000/api/user/logout-all
 Authorization: Bearer {{token}}
 
@@ -143,9 +154,7 @@ Content-Type: application/json
         "postal": 28001,
         "city": "Madrid",
         "province": "Madrid"
-    },
-    "logo": "https://example.com/logo.png",
-    "isFreelance": false
+    }
 }
 
 ### Actualizar compañía (ruta protegida)
@@ -162,10 +171,21 @@ Content-Type: application/json
         "postal": 28001,
         "city": "Madrid",
         "province": "Madrid"
-    },
-    "logo": "https://example.com/logo.png",
-    "isFreelance": false
+    }
 }
+
+### Subir el logo de la compañía con Multer
+### Esto lo que hace es coger el archivo de Content-Disposition y guardarlo en storage
+PATCH http://localhost:3000/api/company/logo
+Authorization: Bearer {{token}}
+Content-Type: multipart/form-data; boundary=----WebKitFormBoundary
+
+------WebKitFormBoundary
+Content-Disposition: form-data; name="logo"; filename="test_logo.png"
+Content-Type: image/png
+
+< ./test_logo.png
+------WebKitFormBoundary--
 
 ### Obtener compañías (ruta protegida)
 GET http://localhost:3000/api/company
@@ -178,3 +198,24 @@ Authorization: Bearer {{token}}
 ### Hard delete de la compañía (ruta protegida)
 DELETE http://localhost:3000/api/company/69d0dbd364ffef7c376a4d4c?soft=false
 Authorization: Bearer {{token}}
+
+### Invitar a un usuario
+### Consiste en crear un nuevo usuario con los datos del JSON y meterle en la compañía del usuario que tiene el token
+### El que invita debe ser admin
+POST http://localhost:3000/api/user/invite
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+    "email": "email@address.com",
+    "name": "Email",
+    "lastName": "Address",
+    "nif": "12345678A",
+    "address": {
+        "street": "Calle X",
+        "number": 123,
+        "postal": 28001,
+        "city": "Madrid",
+        "province": "Madrid"
+    }
+}

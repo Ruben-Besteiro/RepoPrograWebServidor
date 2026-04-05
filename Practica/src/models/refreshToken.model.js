@@ -18,15 +18,18 @@ const refreshTokenSchema = new mongoose.Schema({
         index: { expires: 0 } // TTL index: MongoDB elimina automáticamente
     },
     createdByIp: String,
-    revokedAt: Date,
-    revokedByIp: String
+    revoked: {
+        type: Boolean,
+        default: false
+    }
 }, {
     timestamps: true
 });
 
 // Método para verificar si está activo
+// Cuando llamamos al /refresh, el revoked es true y ese token ya no vale
 refreshTokenSchema.methods.isActive = function () {
-    return !this.revokedAt && this.expiresAt > new Date();
+    return !this.revoked && this.expiresAt > new Date();
 };
 
 const RefreshToken = mongoose.model('RefreshToken', refreshTokenSchema);

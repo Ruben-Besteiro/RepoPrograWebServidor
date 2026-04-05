@@ -10,9 +10,13 @@ const REFRESH_TOKEN_DAYS = 9999999;        // Largo
 /**
  * Genera access token (corta duración)
  */
-export const generateAccessToken = (user) => {
+// Cuando generamos el access token en el user controller, le pasamos el id del refresh token que creamos anteriormente
+// Al incluirlo aquí lo que se hace es que el access token dependa del refresh token
+// Por lo tanto en el logout solo es necesario revocar el refresh token
+// La comprobación de que el refresh token es válido se hace en el auth.middleware.js
+export const generateAccessToken = (user, refreshTokenId) => {
     return jwt.sign(
-        { _id: user._id },
+        { _id: user._id, sessionId: refreshTokenId },
         JWT_SECRET,
         { expiresIn: ACCESS_TOKEN_EXPIRES }
     );

@@ -8,7 +8,7 @@ import { handleHttpError } from '../utils/handleError.js';
  * Middleware de autorización por rol
  * @param {string[]} roles - Array de roles permitidos
  */
-const checkRol = (roles) => (req, res, next) => {
+export const checkRole = (roles) => (req, res, next) => {
     try {
         // El usuario viene del middleware de autenticación (authMiddleware)
         const { user } = req;
@@ -29,5 +29,3 @@ const checkRol = (roles) => (req, res, next) => {
         handleHttpError(res, 'ERROR_PERMISSIONS', 403);
     }
 };
-
-export default checkRol;

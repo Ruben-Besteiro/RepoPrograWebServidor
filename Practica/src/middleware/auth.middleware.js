@@ -1,6 +1,7 @@
 import { verifyAccessToken } from '../utils/handleJwt.js';
 import { User } from '../models/user.model.js';
 import { handleHttpError } from '../utils/handleError.js';
+import RefreshToken from '../models/refreshToken.model.js';
 
 /**
  * Middleware de autenticación y verificación (JWT)
@@ -22,6 +23,16 @@ export const authMiddleware = (requireVerification = true) => async (req, res, n
         if (!dataToken) {
             handleHttpError(res, 'INVALID_TOKEN', 401);
             return;
+        }
+
+        // Verificar vinculación estricta a RefreshToken
+        // Aquí buscamos el refresh token por el sessionId que viene en el access token
+        if (dataToken.sessionId) {
+            const session = await RefreshToken.findById(dataToken.sessionId);
+            if (!session || !session.isActive()) {
+                handleHttpError(res, 'SESSION_REVOKED', 401);
+                return;
+            }
         }
 
         // Buscar el usuario por el ID del token
