@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chat App - Login</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #6366f1;
+            --primary-hover: #4f46e5;
+            --bg: #0f172a;
+            --card-bg: #1e293b;
+            --text: #f8fafc;
+            --text-muted: #94a3b8;
+            --input-bg: #334155;
+            --error: #ef4444;
+            --success: #22c55e;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Outfit', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg);
+            color: var(--text);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            overflow: hidden;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 400px;
+            padding: 2rem;
+            background: var(--card-bg);
+            border-radius: 1.5rem;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            animation: fadeIn 0.5s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        h1 {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+            text-align: center;
+            background: linear-gradient(to right, #818cf8, #c084fc);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        p.subtitle {
+            color: var(--text-muted);
+            text-align: center;
+            margin-bottom: 2rem;
+            font-size: 0.9rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.25rem;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: var(--text-muted);
+        }
+
+        input {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            background: var(--input-bg);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 0.75rem;
+            color: white;
+            transition: all 0.3s ease;
+            outline: none;
+        }
+
+        input:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.2);
+        }
+
+        button {
+            width: 100%;
+            padding: 0.75rem;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 0.75rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            margin-top: 1rem;
+        }
+
+        button:hover {
+            background: var(--primary-hover);
+            transform: translateY(-1px);
+            box-shadow: 0 10px 15px -3px rgba(99, 102, 241, 0.4);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        .toggle {
+            text-align: center;
+            margin-top: 1.5rem;
+            font-size: 0.875rem;
+            color: var(--text-muted);
+        }
+
+        .toggle a {
+            color: var(--primary);
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .toggle a:hover {
+            text-decoration: underline;
+        }
+
+        #message {
+            margin-top: 1rem;
+            padding: 0.75rem;
+            border-radius: 0.5rem;
+            font-size: 0.875rem;
+            display: none;
+            text-align: center;
+        }
+
+        .error { background: rgba(239, 68, 68, 0.1); color: var(--error); border: 1px solid var(--error); }
+        .success { background: rgba(34, 197, 94, 0.1); color: var(--success); border: 1px solid var(--success); }
+
+        /* Background animated circles */
+        .circles {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            z-index: -1;
+        }
+        .circles div {
+            position: absolute;
+            display: block;
+            list-style: none;
+            width: 20px;
+            height: 20px;
+            background: rgba(255, 255, 255, 0.05);
+            animation: animate 25s linear infinite;
+            bottom: -150px;
+            border-radius: 50%;
+        }
+        @keyframes animate {
+            0%{ transform: translateY(0) rotate(0deg); opacity: 1; border-radius: 0; }
+            100%{ transform: translateY(-1000px) rotate(720deg); opacity: 0; border-radius: 50%; }
+        }
+    </style>
+</head>
+<body>
+    <div class="circles">
+        <div style="left: 25%; width: 80px; height: 80px; animation-delay: 0s;"></div>
+        <div style="left: 10%; width: 20px; height: 20px; animation-delay: 2s; animation-duration: 12s;"></div>
+        <div style="left: 70%; width: 20px; height: 20px; animation-delay: 4s;"></div>
+        <div style="left: 40%; width: 60px; height: 60px; animation-delay: 0s; animation-duration: 18s;"></div>
+        <div style="left: 65%; width: 20px; height: 20px; animation-delay: 0s;"></div>
+        <div style="left: 75%; width: 110px; height: 110px; animation-delay: 3s;"></div>
+        <div style="left: 35%; width: 150px; height: 150px; animation-delay: 7s;"></div>
+        <div style="left: 50%; width: 25px; height: 25px; animation-delay: 15s; animation-duration: 45s;"></div>
+        <div style="left: 20%; width: 15px; height: 15px; animation-delay: 2s; animation-duration: 35s;"></div>
+        <div style="left: 85%; width: 150px; height: 150px; animation-delay: 0s; animation-duration: 11s;"></div>
+    </div>
+
+    <div class="container">
+        <h1 id="form-title">Bienvenido</h1>
+        <p class="subtitle" id="form-subtitle">Ingresa tus credenciales para continuar</p>
+        
+        <form id="auth-form">
+            <div class="form-group" id="username-group" style="display: none;">
+                <label for="username">Nombre de Usuario</label>
+                <input type="text" id="username" placeholder="ej. juan_perez">
+            </div>
+            <div class="form-group">
+                <label for="email">Email</label>
+                <input type="email" id="email" placeholder="tu@email.com" required>
+            </div>
+            <div class="form-group">
+                <label for="password">Contraseña</label>
+                <input type="password" id="password" placeholder="••••••••" required>
+            </div>
+            <button type="submit" id="submit-btn">Iniciar Sesión</button>
+        </form>
+
+        <div id="message"></div>
+
+        <div class="toggle">
+            <span id="toggle-text">¿No tienes cuenta?</span>
+            <a href="#" id="toggle-link">Regístrate</a>
+        </div>
+    </div>
+
+    <script>
+        const form = document.getElementById('auth-form');
+        const title = document.getElementById('form-title');
+        const subtitle = document.getElementById('form-subtitle');
+        const usernameGroup = document.getElementById('username-group');
+        const submitBtn = document.getElementById('submit-btn');
+        const toggleLink = document.getElementById('toggle-link');
+        const toggleText = document.getElementById('toggle-text');
+        const messageDiv = document.getElementById('message');
+
+        let isLogin = true;
+
+        toggleLink.addEventListener('click', (e) => {
+            e.preventDefault();
+            isLogin = !isLogin;
+            
+            if (isLogin) {
+                title.innerText = 'Bienvenido';
+                subtitle.innerText = 'Ingresa tus credenciales para continuar';
+                usernameGroup.style.display = 'none';
+                submitBtn.innerText = 'Iniciar Sesión';
+                toggleText.innerText = '¿No tienes cuenta?';
+                toggleLink.innerText = 'Regístrate';
+                document.getElementById('username').required = false;
+            } else {
+                title.innerText = 'Crea tu Cuenta';
+                subtitle.innerText = 'Únete a la mejor comunidad de chat';
+                usernameGroup.style.display = 'block';
+                submitBtn.innerText = 'Registrarse';
+                toggleText.innerText = '¿Ya tienes cuenta?';
+                toggleLink.innerText = 'Inicia Sesión';
+                document.getElementById('username').required = true;
+            }
+            messageDiv.style.display = 'none';
+        });
+
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const username = document.getElementById('username').value;
+
+            const endpoint = isLogin ? '/api/auth/login' : '/api/auth/register';
+            const body = isLogin ? { email, password } : { username, email, password };
+
+            try {
+                const response = await fetch(endpoint, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(body)
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    messageDiv.innerText = isLogin ? 'Iniciando sesión...' : 'Registro exitoso, entrando...';
+                    messageDiv.className = 'success';
+                    messageDiv.style.display = 'block';
+                    
+                    localStorage.setItem('token', data.token);
+                    localStorage.setItem('user', JSON.stringify(data.user));
+
+                    setTimeout(() => {
+                        window.location.href = '/chat.html';
+                    }, 1000);
+                } else {
+                    messageDiv.innerText = data.message || 'Error en la operación';
+                    messageDiv.className = 'error';
+                    messageDiv.style.display = 'block';
+                }
+            } catch (error) {
+                messageDiv.innerText = 'Error de conexión';
+                messageDiv.className = 'error';
+                messageDiv.style.display = 'block';
+            }
+        });
+
+        // Check if already logged in
+        if (localStorage.getItem('token')) {
+            window.location.href = '/chat.html';
+        }
+    </script>
+</body>
+</html>
