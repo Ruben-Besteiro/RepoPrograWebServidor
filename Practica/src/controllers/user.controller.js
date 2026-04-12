@@ -4,7 +4,8 @@ import { Company } from '../models/company.model.js';
 import RefreshToken from '../models/refreshToken.model.js';
 import { generateAccessToken, generateRefreshToken, getRefreshTokenExpiry } from '../utils/handleJwt.js';
 import { encrypt, compare } from '../utils/handlePassword.js';
-import { handleHttpError } from '../utils/handleError.js';
+import { AppError } from '../utils/AppError.js';
+import eventService from '../services/event.service.js';
 
 /**
  * Registrar usuario
@@ -16,8 +17,8 @@ export const registerUser = async (req, res) => {
 
         // Si el email ya existe, peta
         if (await User.findOne({ email: body.email })) {
-            handleHttpError(res, 'EMAIL_ALREADY_EXISTS', 409);
-            return;
+            throw AppError.conflict('EMAIL_ALREADY_EXISTS');
+
         }
 
         // Cifrar contraseña
@@ -40,6 +41,9 @@ export const registerUser = async (req, res) => {
         // Generar access token vinculado a la sesión
         const accessToken = generateAccessToken(user, storedRefreshToken._id);
 
+        // Emitir evento de registro
+        eventService.emit('user:registered', user);
+
         // No devolver la contraseña
         const userObj = user.toObject();
         delete userObj.password;
@@ -50,7 +54,8 @@ export const registerUser = async (req, res) => {
             refreshToken
         });
     } catch (err) {
-        handleHttpError(res, 'ERROR_REGISTER_USER', 500);
+        if (err instanceof AppError) throw err;
+        throw AppError.internal('ERROR_REGISTER_USER');
     }
 };
 
@@ -62,28 +67,31 @@ export const verifyUser = async (req, res) => {
     const user = req.user;
 
     if (!user) {
-        handleHttpError(res, 'USER_NOT_FOUND', 404);
-        return;
+        throw AppError.notFound('USER_NOT_FOUND');
+
     }
 
     // No se puede verificar 2 veces
     if (user.status === 'verified') {
-        handleHttpError(res, 'USER_ALREADY_VERIFIED', 400);
-        return;
+        throw AppError.badRequest('USER_ALREADY_VERIFIED');
+
     }
 
     // Esto se ejecuta a partir del 4º intento
     if (user.verificationAttempts <= 0) {
-        handleHttpError(res, 'MAX_VERIFICATION_ATTEMPTS', 429);
-        // Borrar el usuario
+        throw AppError.badRequest('MAX_VERIFICATION_ATTEMPTS');
+// Borrar el usuario
         await User.findByIdAndDelete(user._id);
+
+        // Emitir evento de borrado (por intentos fallidos)
+        eventService.emit('user:deleted', { _id: user._id, email: user.email, fullName: user.fullName, reason: 'MAX_VERIFICATION_ATTEMPTS' });
         return;
     }
 
     // El código se guarda como string en la BD (aunque sea un número)
     if (user.verificationCode !== String(verificationCode)) {
-        handleHttpError(res, 'INVALID_VERIFICATION_CODE', 401);
-        user.verificationAttempts--;
+        throw AppError.unauthorized('INVALID_VERIFICATION_CODE');
+user.verificationAttempts--;
         await user.save();
         return;
     }
@@ -92,6 +100,9 @@ export const verifyUser = async (req, res) => {
     user.verificationCode = null;
     user.verificationAttempts = 0;
     await user.save();
+
+    // Emitir evento de verificación
+    eventService.emit('user:verified', user);
 
     res.status(200).json({ message: 'USER_VERIFIED' });
 }
@@ -107,15 +118,15 @@ export const loginUser = async (req, res) => {
         // Buscar usuario
         const user = await User.findOne({ email });
         if (!user) {
-            handleHttpError(res, 'USER_NOT_FOUND', 404);
-            return;
+            throw AppError.notFound('USER_NOT_FOUND');
+
         }
 
         // Comparar contraseña con hash
         const isMatch = await compare(password, user.password);
         if (!isMatch) {
-            handleHttpError(res, 'INVALID_PASSWORD', 401);
-            return;
+            throw AppError.unauthorized('INVALID_PASSWORD');
+
         }
 
         // Generar y guardar refresh token en BD primero
@@ -140,7 +151,8 @@ export const loginUser = async (req, res) => {
             refreshToken
         });
     } catch (err) {
-        handleHttpError(res, 'ERROR_LOGIN_USER', 500);
+        if (err instanceof AppError) throw err;
+        throw AppError.internal('ERROR_LOGIN_USER');
     }
 };
 
@@ -155,8 +167,8 @@ export const updateUser = async (req, res) => {
         const { ...body } = req.body;
         const user = await User.findById(req.user._id).populate('company');
         if (!user) {
-            handleHttpError(res, 'USER_NOT_FOUND', 404);
-            return;
+            throw AppError.notFound('USER_NOT_FOUND');
+
         }
         Object.assign(user, body);
         await user.save();
@@ -171,7 +183,8 @@ export const updateUser = async (req, res) => {
         delete userObj.deleted;
         res.status(200).json({ data: userObj });
     } catch (err) {
-        handleHttpError(res, 'ERROR_UPDATE_USER', 500);
+        if (err instanceof AppError) throw err;
+        throw AppError.internal('ERROR_UPDATE_USER');
     }
 }
 
@@ -180,20 +193,21 @@ export const changePassword = async (req, res) => {
         const { password, oldPassword } = req.body;
         const user = await User.findById(req.user._id);
         if (!user) {
-            handleHttpError(res, 'USER_NOT_FOUND', 404);
-            return;
+            throw AppError.notFound('USER_NOT_FOUND');
+
         }
         const isMatch = await compare(oldPassword, user.password);
         if (!isMatch) {
-            handleHttpError(res, 'INVALID_PASSWORD', 401);
-            return;
+            throw AppError.unauthorized('INVALID_PASSWORD');
+
         }
         const hashedPassword = await encrypt(password);
         user.password = hashedPassword;
         await user.save();
         res.status(200).json({ message: 'PASSWORD_CHANGED' });
     } catch (err) {
-        handleHttpError(res, 'ERROR_CHANGE_PASSWORD', 500);
+        if (err instanceof AppError) throw err;
+        throw AppError.internal('ERROR_CHANGE_PASSWORD');
     }
 }
 
@@ -209,7 +223,8 @@ export const getAllUsers = async (req, res) => {
 
         res.status(200).json({ data: users });
     } catch (err) {
-        handleHttpError(res, 'ERROR_GET_USERS', 500);
+        if (err instanceof AppError) throw err;
+        throw AppError.internal('ERROR_GET_USERS');
     }
 };
 
@@ -222,8 +237,8 @@ export const getMe = async (req, res) => {
         const user = req.user;
 
         if (user.deleted === true) {
-            handleHttpError(res, 'USER_IS_SOFT_DELETED', 404);
-            return;
+            throw AppError.notFound('USER_IS_SOFT_DELETED');
+
         }
 
         // Convertimos a objeto plano y quitamos lo que no queremos
@@ -235,7 +250,8 @@ export const getMe = async (req, res) => {
 
         res.status(200).json({ data: userObj });
     } catch (err) {
-        handleHttpError(res, 'ERROR_GET_ME', 500);
+        if (err instanceof AppError) throw err;
+        throw AppError.internal('ERROR_GET_ME');
     }
 };
 
@@ -247,16 +263,16 @@ export const refreshTokenCtrl = async (req, res) => {
         const { refreshToken } = req.body;
 
         if (!refreshToken) {
-            handleHttpError(res, 'REFRESH_TOKEN_REQUIRED', 400);
-            return;
+            throw AppError.badRequest('REFRESH_TOKEN_REQUIRED');
+
         }
 
         // Buscar en BD
         const storedToken = await RefreshToken.findOne({ token: refreshToken }).populate('user');
 
         if (!storedToken || !storedToken.isActive()) {
-            handleHttpError(res, 'INVALID_REFRESH_TOKEN', 401);
-            return;
+            throw AppError.unauthorized('INVALID_REFRESH_TOKEN');
+
         }
 
         // Mandamos el token viejo a la mierda
@@ -276,7 +292,8 @@ export const refreshTokenCtrl = async (req, res) => {
 
         res.status(200).json({ accessToken: newAccessToken, refreshToken: newRefreshTokenStr });
     } catch (err) {
-        handleHttpError(res, 'ERROR_REFRESH_TOKEN', 500);
+        if (err instanceof AppError) throw err;
+        throw AppError.internal('ERROR_REFRESH_TOKEN');
     }
 };
 
@@ -288,15 +305,15 @@ export const logoutUser = async (req, res) => {
         const { refreshToken } = req.body;
 
         if (!refreshToken) {
-            handleHttpError(res, 'REFRESH_TOKEN_REQUIRED', 400);
-            return;
+            throw AppError.badRequest('REFRESH_TOKEN_REQUIRED');
+
         }
 
         const storedToken = await RefreshToken.findOne({ token: refreshToken });
 
         if (!storedToken) {
-            handleHttpError(res, 'TOKEN_NOT_FOUND', 404);
-            return;
+            throw AppError.notFound('TOKEN_NOT_FOUND');
+
         }
 
         // Revocar
@@ -305,7 +322,8 @@ export const logoutUser = async (req, res) => {
 
         res.status(200).json({ message: 'SESSION_CLOSED' });
     } catch (err) {
-        handleHttpError(res, 'ERROR_LOGOUT', 500);
+        if (err instanceof AppError) throw err;
+        throw AppError.internal('ERROR_LOGOUT');
     }
 };
 
@@ -322,7 +340,8 @@ export const revokeAllTokens = async (req, res) => {
 
         res.status(200).json({ message: 'ALL_SESSIONS_CLOSED' });
     } catch (err) {
-        handleHttpError(res, 'ERROR_REVOKE_ALL', 500);
+        if (err instanceof AppError) throw err;
+        throw AppError.internal('ERROR_REVOKE_ALL');
     }
 };
 
@@ -337,33 +356,40 @@ export const deleteUser = async (req, res) => {
 
         const user = await User.findById(id);
         if (!user) {
-            handleHttpError(res, 'USER_NOT_FOUND', 404);
-            return;
+            throw AppError.notFound('USER_NOT_FOUND');
+
         }
 
         if (soft === 'true') {
             // Comprobar si ya estaba marcado como borrado
             if (user.deleted === true) {
-                handleHttpError(res, 'USER_ALREADY_SOFT_DELETED', 400);
-                return;
+                throw AppError.badRequest('USER_ALREADY_SOFT_DELETED');
+
             }
 
             // Soft delete
             user.deleted = true;
             await user.save();
+
+            // Emitir evento de borrado (soft)
+            eventService.emit('user:deleted', { _id: user._id, email: user.email, fullName: user.fullName, type: 'soft' });
             res.status(200).json({ message: 'USER_SOFT_DELETED' });
         } else {
             // Hard delete: intentamos borrarlo
             const result = await User.findByIdAndDelete(id);
             if (!result) {
                 // Por si acaso alguien lo borró justo antes
-                handleHttpError(res, 'USER_NOT_FOUND', 404);
-                return;
+                throw AppError.notFound('USER_NOT_FOUND');
+
             }
+
+            // Emitir evento de borrado (hard)
+            eventService.emit('user:deleted', { _id: id, email: result.email, fullName: result.fullName, type: 'hard' });
             res.status(200).json({ message: 'USER_HARD_DELETED' });
         }
     } catch (err) {
-        handleHttpError(res, 'ERROR_DELETE_USER', 500);
+        if (err instanceof AppError) throw err;
+        throw AppError.internal('ERROR_DELETE_USER');
     }
 };
 
@@ -374,20 +400,21 @@ export const restoreUser = async (req, res) => {
         const user = await User.findById(id);
 
         if (!user) {
-            handleHttpError(res, 'USER_NOT_FOUND', 404);
-            return;
+            throw AppError.notFound('USER_NOT_FOUND');
+
         }
 
         if (user.deleted === false) {
-            handleHttpError(res, 'USER_ALREADY_RESTORED', 400);
-            return;
+            throw AppError.badRequest('USER_ALREADY_RESTORED');
+
         }
 
         user.deleted = false;
         await user.save();
         res.status(200).json({ message: 'USER_RESTORED' });
     } catch (err) {
-        handleHttpError(res, 'ERROR_RESTORE_USER', 500);
+        if (err instanceof AppError) throw err;
+        throw AppError.internal('ERROR_RESTORE_USER');
     }
 };
 
@@ -405,8 +432,8 @@ export const onboardUser = async (req, res) => {
         if (companyExists) {
             // Pero no podemos meter a gente en compañías freelance que no son suyas
             if (companyExists.isFreelance && companyExists.owner.toString() !== user._id.toString()) {
-                handleHttpError(res, 'COMPANY_IS_FREELANCE', 400);
-                return;
+                throw AppError.badRequest('COMPANY_IS_FREELANCE');
+
             }
             user.company = companyExists._id;
             user.role = 'guest';
@@ -431,7 +458,8 @@ export const onboardUser = async (req, res) => {
             }
         });
     } catch (err) {
-        handleHttpError(res, 'ERROR_ONBOARD_USER', 500);
+        if (err instanceof AppError) throw err;
+        throw AppError.internal('ERROR_ONBOARD_USER');
     }
 };
 
@@ -442,8 +470,8 @@ export const inviteUser = async (req, res) => {
 
         // Comprobamos que el admin que invita tiene realmente una compañía
         if (!user.company) {
-            handleHttpError(res, 'USER_HAS_NO_COMPANY', 400);
-            return;
+            throw AppError.badRequest('USER_HAS_NO_COMPANY');
+
         }
 
         // Si el usuario existe, simplemente lo metemos en la compañía del invitador
@@ -452,6 +480,9 @@ export const inviteUser = async (req, res) => {
             userExists.company = user.company._id;
             userExists.role = 'guest';
             await userExists.save();
+
+            // Emitir evento de invitación
+            eventService.emit('user:invited', userExists);
             res.status(200).json({ message: 'USER_INVITED', data: userExists });
             return;
         }
@@ -467,8 +498,12 @@ export const inviteUser = async (req, res) => {
             role: 'guest'
         });
 
+        // Emitir evento de invitación (y creación)
+        eventService.emit('user:invited', newUser);
+
         res.status(200).json({ message: 'USER_INVITED_AND_CREATED', data: newUser });
     } catch (err) {
-        handleHttpError(res, 'ERROR_INVITE_USER', 500);
+        if (err instanceof AppError) throw err;
+        throw AppError.internal('ERROR_INVITE_USER');
     }
 };

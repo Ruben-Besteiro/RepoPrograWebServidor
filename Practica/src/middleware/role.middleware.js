@@ -1,5 +1,5 @@
 // src/middleware/role.middleware.js
-import { handleHttpError } from '../utils/handleError.js';
+import { AppError } from '../utils/AppError.js';
 
 // Esto se llamará cuando queramos usar un endpoint que requiera un rol específico
 // Por ejemplo, para crear una peli, se necesita el rol 'admin'
@@ -20,12 +20,13 @@ export const checkRole = (roles) => (req, res, next) => {
         const checkValueRol = roles.includes(userRol);
 
         if (!checkValueRol) {
-            handleHttpError(res, 'NOT_ALLOWED', 403);
-            return;
+            throw AppError.forbidden('NOT_ALLOWED');
+
         }
 
         next();
     } catch (err) {
-        handleHttpError(res, 'ERROR_PERMISSIONS', 403);
+        if (err instanceof AppError) throw err;
+        throw AppError.forbidden('ERROR_PERMISSIONS');
     }
 };

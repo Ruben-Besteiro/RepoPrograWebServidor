@@ -1,6 +1,6 @@
 import { verifyAccessToken } from '../utils/handleJwt.js';
 import { User } from '../models/user.model.js';
-import { handleHttpError } from '../utils/handleError.js';
+import { AppError } from '../utils/AppError.js';
 import RefreshToken from '../models/refreshToken.model.js';
 
 /**
@@ -13,16 +13,16 @@ import RefreshToken from '../models/refreshToken.model.js';
 export const authMiddleware = (requireVerification = true) => async (req, res, next) => {
     try {
         if (!req.headers.authorization) {
-            handleHttpError(res, 'NOT_AUTHENTICATED', 401);
-            return;
+            throw AppError.unauthorized('NOT_AUTHENTICATED');
+
         }
 
         const token = req.headers.authorization.split(' ').pop(); // Bearer <TOKEN>
         const dataToken = verifyAccessToken(token);
 
         if (!dataToken) {
-            handleHttpError(res, 'INVALID_TOKEN', 401);
-            return;
+            throw AppError.unauthorized('INVALID_TOKEN');
+
         }
 
         // Verificar vinculación estricta a RefreshToken
@@ -30,8 +30,8 @@ export const authMiddleware = (requireVerification = true) => async (req, res, n
         if (dataToken.sessionId) {
             const session = await RefreshToken.findById(dataToken.sessionId);
             if (!session || !session.isActive()) {
-                handleHttpError(res, 'SESSION_REVOKED', 401);
-                return;
+                throw AppError.unauthorized('SESSION_REVOKED');
+
             }
         }
 
@@ -39,14 +39,14 @@ export const authMiddleware = (requireVerification = true) => async (req, res, n
         const user = await User.findById(dataToken._id).populate('company');
 
         if (!user) {
-            handleHttpError(res, 'USER_NOT_FOUND', 404);
-            return;
+            throw AppError.notFound('USER_NOT_FOUND');
+
         }
 
         // Si se requiere verificación y el usuario está pendiente, bloqueamos
         if (requireVerification && user.status !== 'verified') {
-            handleHttpError(res, 'NOT_VERIFIED', 401);
-            return;
+            throw AppError.unauthorized('NOT_VERIFIED');
+
         }
 
         // Añadir el usuario a la request para que esté disponible en los controladores
@@ -54,7 +54,8 @@ export const authMiddleware = (requireVerification = true) => async (req, res, n
 
         next();
     } catch (err) {
-        handleHttpError(res, 'ERROR_AUTH_MIDDLEWARE', 500);
+        if (err instanceof AppError) throw err;
+        throw AppError.internal('ERROR_AUTH_MIDDLEWARE');
     }
 };
 

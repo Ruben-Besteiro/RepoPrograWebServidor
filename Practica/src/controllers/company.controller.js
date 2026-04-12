@@ -1,5 +1,5 @@
 import { Company } from '../models/company.model.js';
-import { handleHttpError } from '../utils/handleError.js';
+import { AppError } from '../utils/AppError.js';
 
 export const createCompany = async (req, res) => {
     try {
@@ -8,7 +8,8 @@ export const createCompany = async (req, res) => {
         await company.save();
         res.status(201).json({ data: company });
     } catch (err) {
-        handleHttpError(res, 'ERROR_CREATE_COMPANY', 500);
+        if (err instanceof AppError) throw err;
+        throw AppError.internal('ERROR_CREATE_COMPANY');
     }
 };
 
@@ -17,7 +18,8 @@ export const updateCompany = async (req, res) => {
         const company = await Company.findByIdAndUpdate(req.params.id, req.body, { new: true, runValidators: true });
         res.status(200).json({ data: company });
     } catch (err) {
-        handleHttpError(res, 'ERROR_UPDATE_COMPANY', 500);
+        if (err instanceof AppError) throw err;
+        throw AppError.internal('ERROR_UPDATE_COMPANY');
     }
 };
 
@@ -26,7 +28,8 @@ export const getCompanies = async (req, res) => {
         const companies = await Company.find({ deleted: false });
         res.status(200).json({ data: companies });
     } catch (err) {
-        handleHttpError(res, 'ERROR_GET_COMPANIES', 500);
+        if (err instanceof AppError) throw err;
+        throw AppError.internal('ERROR_GET_COMPANIES');
     }
 };
 
@@ -35,7 +38,8 @@ export const deleteCompany = async (req, res) => {
         const company = await Company.findByIdAndDelete(req.params.id);
         res.status(200).json({ data: company });
     } catch (err) {
-        handleHttpError(res, 'ERROR_DELETE_COMPANY', 500);
+        if (err instanceof AppError) throw err;
+        throw AppError.internal('ERROR_DELETE_COMPANY');
     }
 };
 
@@ -46,14 +50,14 @@ export const editLogo = async (req, res) => {
 
         // Comprobar si multer subió un archivo
         if (!file) {
-            handleHttpError(res, 'NO_IMAGE_UPLOADED', 400);
-            return;
+            throw AppError.badRequest('NO_IMAGE_UPLOADED');
+
         }
 
         // Comprobar si el usuario tiene una compañía
         if (!user.company) {
-            handleHttpError(res, 'USER_HAS_NO_COMPANY', 403);
-            return;
+            throw AppError.forbidden('USER_HAS_NO_COMPANY');
+
         }
 
         // Construir la URL completa del archivo base
@@ -70,6 +74,7 @@ export const editLogo = async (req, res) => {
 
         res.status(200).json({ message: 'LOGO_UPDATED', data: { logo: company.logo } });
     } catch (err) {
-        handleHttpError(res, 'ERROR_UPDATE_LOGO', 500);
+        if (err instanceof AppError) throw err;
+        throw AppError.internal('ERROR_UPDATE_LOGO');
     }
 };
