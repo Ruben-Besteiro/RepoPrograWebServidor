@@ -7,10 +7,9 @@ import path from 'path';
 import dbConnect from './config/db.js';
 import routes from './routes/index.js';
 import { errorHandler, notFound } from './middleware/error.middleware.js';
-import morganBody from 'morgan-body';
-import { loggerStream } from './utils/handleSlack.js';
+//import morganBody from 'morgan-body';
 import swaggerUi from 'swagger-ui-express';
-import swaggerSpecs from './config/swagger.js';
+//import swaggerSpecs from './config/swagger.js';
 import { initSocket } from './socket/index.js';
 
 const app = express();
@@ -29,11 +28,11 @@ const __dirname = import.meta.dirname;
 app.use(express.static(path.join(__dirname, '../public')));
 
 // Morgan Body - Para reportar errores a Slack
-morganBody(app, {
+/*morganBody(app, {
   noColors: true,
   stream: loggerStream,
   skip: (req, res) => res.statusCode < 400
-});
+});*/
 
 // Health check
 app.get('/health', (req, res) => {
@@ -44,7 +43,7 @@ app.get('/health', (req, res) => {
 });
 
 // Swagger documentation
-app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpecs));
+//app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpecs));
 
 // Rutas de la API
 app.use('/api', routes);

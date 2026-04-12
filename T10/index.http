@@ -1,0 +1,43 @@
+@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY5ZGJhY2E3OGQ0MzczYjRlNjc5OTk5YiIsImlhdCI6MTc3NjAwNDI2MywiZXhwIjoxNzc2MDExNDYzfQ.Cnd6zmoNJs_q0jMaOxKIftIwXIk26bef38jJAC7XWGM
+
+### Registro
+POST http://localhost:3000/api/auth/register
+Content-Type: application/json
+
+{
+    "username": "LigmaBalls777",
+    "email": "ligmaballs777@yopmail.xd",
+    "password": "contrasegna",
+    "online": false
+}
+
+### Login
+POST http://localhost:3000/api/auth/login
+Content-Type: application/json
+
+{
+    "email": "ligmaballs777@yopmail.xd",
+    "password": "contrasegna"
+}
+
+### Obtener perfil del usuario actual
+GET http://localhost:3000/api/auth/me
+Authorization: Bearer {{token}}
+
+### Obtener salas
+GET http://localhost:3000/api/rooms
+Authorization: Bearer {{token}}
+
+### Crear sala
+POST http://localhost:3000/api/rooms
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+    "name": "Sala 1",
+    "description": "Sala 1"
+}
+
+### Obtener mensajes de una sala
+GET http://localhost:3000/api/rooms/69dbaed38d4373b4e679999d/messages
+Authorization: Bearer {{token}}
