@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -20,8 +21,19 @@
             --accent: #10b981;
         }
 
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Outfit', sans-serif; }
-        body { background-color: var(--bg); color: var(--text); height: 100vh; overflow: hidden; }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Outfit', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg);
+            color: var(--text);
+            height: 100vh;
+            overflow: hidden;
+        }
 
         .app-container {
             display: grid;
@@ -44,7 +56,7 @@
             gap: 1rem;
             margin-bottom: 2rem;
             padding-bottom: 1.5rem;
-            border-bottom: 1px solid rgba(255,255,255,0.05);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
         }
 
         .avatar {
@@ -58,8 +70,14 @@
             font-weight: 600;
         }
 
-        .user-info h4 { font-size: 1rem; }
-        .user-info span { font-size: 0.8rem; color: var(--text-muted); }
+        .user-info h4 {
+            font-size: 1rem;
+        }
+
+        .user-info span {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+        }
 
         .section-title {
             color: var(--text-muted);
@@ -80,7 +98,11 @@
             font-size: 1.2rem;
         }
 
-        .rooms-list { flex-grow: 1; overflow-y: auto; }
+        .rooms-list {
+            flex-grow: 1;
+            overflow-y: auto;
+        }
+
         .room-item {
             padding: 0.75rem 1rem;
             border-radius: 0.75rem;
@@ -91,9 +113,19 @@
             align-items: center;
             gap: 0.75rem;
         }
-        .room-item:hover { background: rgba(255,255,255,0.05); }
-        .room-item.active { background: var(--primary); color: white; }
-        .room-item i { opacity: 0.6; }
+
+        .room-item:hover {
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .room-item.active {
+            background: var(--primary);
+            color: white;
+        }
+
+        .room-item i {
+            opacity: 0.6;
+        }
 
         .logout-btn {
             margin-top: auto;
@@ -119,7 +151,7 @@
             padding: 1rem 2rem;
             background: rgba(30, 41, 59, 0.5);
             backdrop-filter: blur(8px);
-            border-bottom: 1px solid rgba(255,255,255,0.05);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -145,8 +177,15 @@
         }
 
         @keyframes slideUp {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
         .message.received {
@@ -168,9 +207,19 @@
             justify-content: space-between;
             gap: 1rem;
         }
-        .msg-time { opacity: 0.6; }
-        .msg-user { font-weight: 600; color: var(--primary-light); }
-        .sent .msg-user { color: white; }
+
+        .msg-time {
+            opacity: 0.6;
+        }
+
+        .msg-user {
+            font-weight: 600;
+            color: var(--primary-light);
+        }
+
+        .sent .msg-user {
+            color: white;
+        }
 
         .typing-indicator {
             padding: 0.5rem 2rem;
@@ -183,7 +232,7 @@
         .chat-input-area {
             padding: 1.5rem 2rem;
             background: rgba(30, 41, 59, 0.5);
-            border-top: 1px solid rgba(255,255,255,0.05);
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
         }
 
         .input-wrapper {
@@ -218,31 +267,40 @@
         /* Modal simple */
         .modal {
             position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.8);
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
             display: none;
             justify-content: center;
             align-items: center;
             z-index: 1000;
         }
+
         .modal-content {
             background: var(--card-bg);
             padding: 2rem;
             border-radius: 1rem;
             width: 350px;
         }
-        .modal-content h3 { margin-bottom: 1rem; }
+
+        .modal-content h3 {
+            margin-bottom: 1rem;
+        }
+
         .modal-content input {
             width: 100%;
             padding: 0.75rem;
             margin-bottom: 1rem;
             background: var(--input-bg);
-            border: 1px solid rgba(255,255,255,0.1);
+            border: 1px solid rgba(255, 255, 255, 0.1);
             color: white;
             border-radius: 0.5rem;
         }
     </style>
 </head>
+
 <body>
     <div class="app-container">
         <!-- Sidebar -->
@@ -259,7 +317,7 @@
                 Salas
                 <button class="add-room-btn" onclick="showModal()">+</button>
             </div>
-            
+
             <div class="rooms-list" id="rooms-list">
                 <!-- Salas dinámicas -->
             </div>
@@ -325,15 +383,27 @@
         let currentRoomId = null;
         let typingTimeout = null;
 
+        // Helper: si el servidor devuelve 401, redirigir al login
+        function handleAuthError(res) {
+            if (res.status === 401) {
+                alert('Tu sesión ha expirado. Inicia sesión de nuevo.');
+                localStorage.clear();
+                window.location.href = '/index.html';
+                return true;
+            }
+            return false;
+        }
+
         // Fetch Rooms
         async function fetchRooms() {
             const res = await fetch('/api/rooms', {
                 headers: { 'Authorization': `Bearer ${token}` }
             });
+            if (handleAuthError(res)) return;
             const rooms = await res.json();
             const list = document.getElementById('rooms-list');
             list.innerHTML = '';
-            
+
             rooms.forEach(room => {
                 const div = document.createElement('div');
                 div.className = `room-item ${currentRoomId === room._id ? 'active' : ''}`;
@@ -345,11 +415,11 @@
 
         function joinRoom(id, name) {
             if (currentRoomId === id) return;
-            
+
             currentRoomId = id;
             document.getElementById('current-room-name').innerText = `# ${name}`;
             document.getElementById('messages-container').innerHTML = '<div class="loading">Cargando mensajes...</div>';
-            
+
             // Highlight active room
             const items = document.querySelectorAll('.room-item');
             items.forEach(item => {
@@ -359,7 +429,7 @@
 
             // Join via socket
             socket.emit('room:join', { roomId: id });
-            
+
             // Load history
             loadHistory(id);
         }
@@ -368,10 +438,11 @@
             const res = await fetch(`/api/rooms/${id}/messages`, {
                 headers: { 'Authorization': `Bearer ${token}` }
             });
+            if (handleAuthError(res)) return;
             const messages = await res.json();
             const container = document.getElementById('messages-container');
             container.innerHTML = '';
-            
+
             messages.forEach(msg => {
                 appendMessage(msg.user.username, msg.content, msg.createdAt, msg.user._id === user.id);
             });
@@ -382,9 +453,9 @@
             const container = document.getElementById('messages-container');
             const div = document.createElement('div');
             div.className = `message ${isMe ? 'sent' : 'received'}`;
-            
+
             const time = new Date(timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-            
+
             div.innerHTML = `
                 <div class="msg-info">
                     <span class="msg-user">${isMe ? 'Tú' : username}</span>
@@ -400,10 +471,18 @@
             e.preventDefault();
             const input = document.getElementById('message-input');
             const content = input.value.trim();
-            
+
+            console.log("Intentando enviar mensaje:", { content, currentRoomId, socketConnected: socket.connected });
+
             if (content && currentRoomId) {
-                socket.emit('chat:message', { roomId: currentRoomId, content });
-                input.value = '';
+                if (socket.connected) {
+                    socket.emit('chat:message', { roomId: currentRoomId, content });
+                    input.value = '';
+                } else {
+                    alert("Socket no conectado. Por favor, recarga la página.");
+                }
+            } else if (!currentRoomId) {
+                alert("Por favor, selecciona una sala primero.");
             }
         }
 
@@ -414,9 +493,40 @@
             }
         });
 
+        // --- Notificaciones del navegador ---
+        // Pedir permiso para notificaciones al cargar la página
+        if ('Notification' in window && Notification.permission === 'default') {
+            Notification.requestPermission();
+        }
+
+        function showBrowserNotification(username, content) {
+            // Solo mostrar si la pestaña no tiene foco y si el permiso está concedido
+            if (document.hidden && 'Notification' in window && Notification.permission === 'granted') {
+                const notification = new Notification(`💬 ${username}`, {
+                    body: content.length > 100 ? content.substring(0, 100) + '...' : content,
+                    icon: '/icon.png',
+                    tag: 'chat-message' // Agrupa notificaciones
+                });
+
+                // Al hacer clic en la notificación, enfocar la pestaña
+                notification.onclick = () => {
+                    window.focus();
+                    notification.close();
+                };
+
+                // Auto-cerrar después de 5 segundos
+                setTimeout(() => notification.close(), 5000);
+            }
+        }
+
         // Socket listeners
         socket.on('chat:message', (data) => {
             appendMessage(data.user.username, data.content, data.timestamp, data.user.id === user.id);
+
+            // Mostrar notificación del navegador si el mensaje NO es mío
+            if (data.user.id !== user.id) {
+                showBrowserNotification(data.user.username, data.content);
+            }
         });
 
         socket.on('chat:typing', (data) => {
@@ -428,10 +538,6 @@
             }, 2000);
         });
 
-        socket.on('room:user-joined', (data) => {
-             // Notificación leve puede ir aquí
-        });
-
         socket.on('error', (data) => alert(data.message));
 
         // Room creation
@@ -439,25 +545,38 @@
         function hideModal() { document.getElementById('room-modal').style.display = 'none'; }
 
         async function createRoom() {
-            const name = document.getElementById('new-room-name').value;
-            const description = document.getElementById('new-room-desc').value;
-            
-            if (!name) return;
+            const name = document.getElementById('new-room-name').value.trim();
+            const description = document.getElementById('new-room-desc').value.trim();
 
-            const res = await fetch('/api/rooms', {
-                method: 'POST',
-                headers: { 
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${token}`
-                },
-                body: JSON.stringify({ name, description })
-            });
+            if (!name) {
+                alert('Por favor, introduce un nombre para la sala.');
+                return;
+            }
 
-            if (res.ok) {
-                hideModal();
-                fetchRooms();
-                document.getElementById('new-room-name').value = '';
-                document.getElementById('new-room-desc').value = '';
+            try {
+                const res = await fetch('/api/rooms', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify({ name, description })
+                });
+
+                if (handleAuthError(res)) return;
+                const data = await res.json();
+
+                if (res.ok) {
+                    hideModal();
+                    document.getElementById('new-room-name').value = '';
+                    document.getElementById('new-room-desc').value = '';
+                    await fetchRooms();
+                } else {
+                    alert(data.message || 'Error al crear la sala');
+                }
+            } catch (error) {
+                console.error('Error al crear sala:', error);
+                alert('Error de conexión al crear la sala. Revisa la consola.');
             }
         }
 
@@ -473,6 +592,68 @@
 
         // Initial load
         fetchRooms();
+
+        // --- Push Notifications ---
+        async function initPushNotifications() {
+            if (!('serviceWorker' in navigator) || !('PushManager' in window)) {
+                console.warn('Push notifications are not supported in this browser');
+                return;
+            }
+
+            try {
+                // Register Service Worker
+                const registration = await navigator.serviceWorker.register('/sw.js');
+                console.log('Service Worker registered');
+
+                // Get VAPID public key
+                const keyRes = await fetch('/api/notifications/vapid-key', {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const { publicKey } = await keyRes.json();
+
+                // Check existing subscription
+                let subscription = await registration.pushManager.getSubscription();
+
+                if (!subscription) {
+                    // Subscribe user
+                    subscription = await registration.pushManager.subscribe({
+                        userVisibleOnly: true,
+                        applicationServerKey: urlBase64ToUint8Array(publicKey)
+                    });
+                }
+
+                // Send subscription to server
+                await fetch('/api/notifications/subscribe', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify({ subscription })
+                });
+
+                console.log('User is subscribed to Push Notifications');
+            } catch (error) {
+                console.error('Error initializing push notifications:', error);
+            }
+        }
+
+        // Helper to convert base64 VAPID key
+        function urlBase64ToUint8Array(base64String) {
+            const padding = '='.repeat((4 - base64String.length % 4) % 4);
+            const base64 = (base64String + padding)
+                .replace(/\-/g, '+')
+                .replace(/_/g, '/');
+            const rawData = window.atob(base64);
+            const outputArray = new Uint8Array(rawData.length);
+            for (let i = 0; i < rawData.length; ++i) {
+                outputArray[i] = rawData.charCodeAt(i);
+            }
+            return outputArray;
+        }
+
+        initPushNotifications();
     </script>
 </body>
+
 </html>

@@ -1,4 +1,4 @@
-@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY5ZGJhY2E3OGQ0MzczYjRlNjc5OTk5YiIsImlhdCI6MTc3NjAwNDI2MywiZXhwIjoxNzc2MDExNDYzfQ.Cnd6zmoNJs_q0jMaOxKIftIwXIk26bef38jJAC7XWGM
+@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY5ZTFlZDdhODcyYTQ5NzE1NDhmY2QyYSIsImlhdCI6MTc3NjQxNDMwNiwiZXhwIjoxNzc2NDIxNTA2fQ.nehP3i3DT4XmMjI17P1jJqSsICX7HzhkMhAdfY1m4ls
 
 ### Registro
 POST http://localhost:3000/api/auth/register
@@ -34,10 +34,23 @@ Authorization: Bearer {{token}}
 Content-Type: application/json
 
 {
-    "name": "Sala 1",
-    "description": "Sala 1"
+    "name": "Sala 2",
+    "description": "Sala 2"
 }
 
 ### Obtener mensajes de una sala
 GET http://localhost:3000/api/rooms/69dbaed38d4373b4e679999d/messages
+Authorization: Bearer {{token}}
+
+### Editar mensaje
+PUT http://localhost:3000/api/rooms/69dbaed38d4373b4e679999d/messages/69e1ed86f1f6d43c6a098938
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+    "content": "Mensaje editado"
+}
+
+### Borrar mensaje
+DELETE http://localhost:3000/api/rooms/69dbaed38d4373b4e679999d/messages/69e1ed86f1f6d43c6a098938
 Authorization: Bearer {{token}}

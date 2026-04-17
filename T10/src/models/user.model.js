@@ -21,6 +21,10 @@ const userSchema = new mongoose.Schema({
   online: {
     type: Boolean,
     default: false,
+  },
+  pushSubscription: {
+    type: Object,
+    default: null
   }
 }, {
   timestamps: true,

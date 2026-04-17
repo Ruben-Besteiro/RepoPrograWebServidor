@@ -3,7 +3,7 @@ import Room from '../../models/room.model.js';
 export default (io, socket) => {
   const joinRoom = async (payload) => {
     const { roomId } = payload;
-    
+
     try {
       const room = await Room.findById(roomId);
       if (!room) {
@@ -18,13 +18,22 @@ export default (io, socket) => {
       socket.join(roomId);
       console.log(`📡 User ${socket.user.username} se unió a ${room.name}`);
 
+      // Añadir al usuario a la lista de miembros de la sala si no está
+      if (!room.members) room.members = [];
+      const isMember = room.members.some(memberId => memberId.toString() === socket.user._id.toString());
+
+      if (!isMember) {
+        room.members.push(socket.user._id);
+        await room.save();
+      }
+
       // Confirmar al usuario que se unió
       // En una implementación real podrías enviar también la lista de usuarios conectados a esa sala
       socket.emit('room:joined', { room });
 
       // Notificar a otros en la sala
-      socket.to(roomId).emit('room:user-joined', { 
-        user: { id: socket.user._id, username: socket.user.username } 
+      socket.to(roomId).emit('room:user-joined', {
+        user: { id: socket.user._id, username: socket.user.username }
       });
 
     } catch (error) {
@@ -35,9 +44,9 @@ export default (io, socket) => {
   const leaveRoom = async (payload) => {
     const { roomId } = payload;
     socket.leave(roomId);
-    
-    socket.to(roomId).emit('room:user-left', { 
-      user: { id: socket.user._id, username: socket.user.username } 
+
+    socket.to(roomId).emit('room:user-left', {
+      user: { id: socket.user._id, username: socket.user.username }
     });
   };
 

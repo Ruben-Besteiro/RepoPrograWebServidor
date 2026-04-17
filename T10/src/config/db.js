@@ -13,7 +13,9 @@ const dbConnect = async () => {
     }
 
     try {
-        await mongoose.connect(DATABASE_URI);
+        await mongoose.connect(DATABASE_URI, {
+            dbName: process.env.DB_NAME || 't10'
+        });
         console.log('✅ Conectado a MongoDB');
     } catch (error) {
         console.error('❌ Error conectando a MongoDB:', error.message);

@@ -11,6 +11,10 @@ import { errorHandler, notFound } from './middleware/error.middleware.js';
 import swaggerUi from 'swagger-ui-express';
 //import swaggerSpecs from './config/swagger.js';
 import { initSocket } from './socket/index.js';
+import { setupWebPush } from './utils/notification.js';
+
+// Inicializar Push Notifications
+setupWebPush();
 
 const app = express();
 const httpServer = createServer(app);
