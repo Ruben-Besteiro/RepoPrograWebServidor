@@ -1,0 +1,219 @@
+@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2OWQwZTY4ZTkyMmFkYTE2NDY3YTM3OGIiLCJzZXNzaW9uSWQiOiI2OWRhODA0NDJlZGQ3MmMzNjM4M2VjZDkiLCJpYXQiOjE3NzU5MjczNjQsImV4cCI6MTc3NTkyODI2NH0.6oENuap_scaqTFEGojC0TxNdX40Tvoaewb94BBbvpvQ
+@refreshToken = 5f7db270eeb999aabe022fa3d1c0b6f84556684c05a910c0f8fcc73316e296a36406b27d001d2a48180c2084aef11f7fff1059629137401ca8aa054f25b13bd5
+// El token debe ir arriba
+
+### Registrar usuario (hay que verificarlo) (por defecto es admin)
+POST http://localhost:3000/api/user/register
+Content-Type: application/json
+
+{
+    "email": "willyrex@gmail.com",
+    "password": "QueVivaElMaincra69@",
+    "name": "Willy",
+    "lastName": "Rex",
+    "nif": "12345678A",
+    "address": {
+        "street": "Calle Ñ",
+        "number": 123,
+        "postal": 28001,
+        "city": "Madrid",
+        "province": "Madrid"
+    }
+}
+
+### Verificar al usuario que tiene el token
+PUT http://localhost:3000/api/user/verify
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+    "verificationCode": 661561
+}
+
+### Login
+### No utiliza el token ni tampoco ningún middleware
+POST http://localhost:3000/api/user/login
+Content-Type: application/json
+
+{
+    "email": "willyrex@gmail.com",
+    "password": "vetr7n8y0rvtey7n8cwty7n90wtrvy7n0c8y890ecnrtwy7new0ctv07ecwtnvy8"
+}
+
+### Actualizar el usuario que tiene el token
+### PUT normalmente borra los campos que faltan
+### pero aquí no porque estoy usando Object.assign
+PUT http://localhost:3000/api/user
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+    "name": "Vegetta",
+    "lastName": "777",
+    "nif": "12345678A",
+    "address": {
+        "street": "Calle Ñ",
+        "number": 123,
+        "postal": 28001,
+        "city": "Madrid",
+        "province": "Madrid"
+    }
+}
+
+### Cambiar solo la contraseña de un usuario
+PATCH http://localhost:3000/api/user/password
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+    "oldPassword": "QueVivaElMaincra69@",
+    "password": "vetr7n8y0rvtey7n8cwty7n90wtrvy7n0c8y890ecnrtwy7new0ctv07ecwtnvy8"
+}
+
+### Meter a un usuario en una compañía
+### Si el ID no existe, crea una compañía freelance
+### Pero si sí existe, el usuario pasa a ser guest
+PATCH http://localhost:3000/api/user/company
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+    "company": "69d0e7e4d06b8140f7fc6609"
+}
+
+### Obtener usuarios (ruta protegida)
+GET http://localhost:3000/api/user
+Authorization: Bearer {{token}}
+
+### Obtener los datos del usuario que tiene el token
+GET http://localhost:3000/api/user/me
+Authorization: Bearer {{token}}
+
+
+### Refrescar el access token
+POST http://localhost:3000/api/user/refresh
+Content-Type: application/json
+
+{
+    "refreshToken": "{{refreshToken}}"
+}
+
+### Cerrar sesión (manda a tomar por culo ambos tokens)
+POST http://localhost:3000/api/user/logout
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+    "refreshToken": "{{refreshToken}}"
+}
+
+### Cerrar todas las sesiones (necesita accessToken)
+POST http://localhost:3000/api/user/logout-all
+Authorization: Bearer {{token}}
+
+### Borrar usuario por ID
+#DELETE http://localhost:3000/api/user?soft=false
+#Authorization: Bearer {{token}}
+#Content-Type: application/json
+
+#{
+#    "id": "69d0d997603bbddcb8b9292f"
+#}
+
+### Soft delete
+DELETE http://localhost:3000/api/user?soft=true
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+    "id": "69d0dac112c27a9a11bffbb4"
+}
+
+### Restaurar un usuario que fue soft deleteado
+PUT http://localhost:3000/api/user/restore
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+    "id": "69d0dac112c27a9a11bffbb4"
+}
+
+### Crear compañía (ruta protegida)
+POST http://localhost:3000/api/company
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+    "name": "Mi Empresa",
+    "cif": "E12345678",
+    "address": {
+        "street": "Calle Falsa",
+        "number": 123,
+        "postal": 28001,
+        "city": "Madrid",
+        "province": "Madrid"
+    }
+}
+
+### Actualizar compañía (ruta protegida)
+PUT http://localhost:3000/api/company/69d0dbd364ffef7c376a4d4c
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+    "name": "Mi Empresa Actualizada",
+    "cif": "E12345678",
+    "address": {
+        "street": "Calle Falsa",
+        "number": 123,
+        "postal": 28001,
+        "city": "Madrid",
+        "province": "Madrid"
+    }
+}
+
+### Subir el logo de la compañía con Multer
+### Esto lo que hace es coger el archivo de Content-Disposition y guardarlo en storage
+PATCH http://localhost:3000/api/company/logo
+Authorization: Bearer {{token}}
+Content-Type: multipart/form-data; boundary=----WebKitFormBoundary
+
+------WebKitFormBoundary
+Content-Disposition: form-data; name="logo"; filename="test_logo.png"
+Content-Type: image/png
+
+< ./test_logo.png
+------WebKitFormBoundary--
+
+### Obtener compañías (ruta protegida)
+GET http://localhost:3000/api/company
+Authorization: Bearer {{token}}
+
+### Soft delete de la compañía (ruta protegida)
+DELETE http://localhost:3000/api/company/69d0dbd364ffef7c376a4d4c?soft=true
+Authorization: Bearer {{token}}
+
+### Hard delete de la compañía (ruta protegida)
+DELETE http://localhost:3000/api/company/69d0dbd364ffef7c376a4d4c?soft=false
+Authorization: Bearer {{token}}
+
+### Invitar a un usuario
+### Consiste en crear un nuevo usuario con los datos del JSON y meterle en la compañía del usuario que tiene el token
+### El que invita debe ser admin
+POST http://localhost:3000/api/user/invite
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+    "email": "email@address.com",
+    "name": "Email",
+    "lastName": "Address",
+    "nif": "12345678A",
+    "address": {
+        "street": "Calle X",
+        "number": 123,
+        "postal": 28001,
+        "city": "Madrid",
+        "province": "Madrid"
+    }
+}

@@ -1,0 +1,32 @@
+{
+  "compilerOptions": {
+    // Versión de JavaScript de salida
+    "target": "ES2022",
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
+
+    // Directorio de salida
+    "outDir": "./dist",
+    "rootDir": "./src",
+
+    // Estricto (recomendado)
+    "strict": true,
+    "noImplicitAny": true,
+    "strictNullChecks": true,
+
+    // Interoperabilidad
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "forceConsistentCasingInFileNames": true,
+
+    // Source maps para debugging
+    "sourceMap": true,
+    "declaration": true,
+
+    // Otras opciones útiles
+    "skipLibCheck": true,
+    "resolveJsonModule": true
+  },
+  "include": ["src/**/*"],
+  "exclude": ["node_modules", "dist"]
+}
