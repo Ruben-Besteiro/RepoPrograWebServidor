@@ -8,9 +8,17 @@ eventService.on('user:registered', async (user) => {
     console.log(`[EVENT] user:registered - User: ${user.fullName}, Email: ${user.email}`);
 
     if (user.verificationCode) {
-        // Aquí llamamos al mail.service.ts
-        // Con esto se cumple lo de que el usuario está verificado cuando se le envía el correo
-        await sendVerificationEmail(user.email, user.verificationCode);
+        console.log(`[EVENT] user:registered - Calling sendVerificationEmail for ${user.email}`);
+        try {
+            // Aquí llamamos al mail.service.ts
+            // Con esto se cumple lo de que el usuario está verificado cuando se le envía el correo
+            await sendVerificationEmail(user.email, user.verificationCode);
+            console.log(`[EVENT] user:registered - sendVerificationEmail completed for ${user.email}`);
+        } catch (error) {
+            console.error(`[EVENT] user:registered - Error calling sendVerificationEmail for ${user.email}:`, error);
+        }
+    } else {
+        console.warn(`[EVENT] user:registered - No verificationCode found for user ${user.email}, skipping email`);
     }
 });
 
