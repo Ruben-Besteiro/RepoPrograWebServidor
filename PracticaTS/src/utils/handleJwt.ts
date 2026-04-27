@@ -4,7 +4,7 @@ import { UserInterface } from '../models/user.model.js';
 
 const JWT_SECRET = process.env.JWT_SECRET || 'secret';
 // Esto de aquí se puede poner en el .env pero paso de complicarme la vida
-const ACCESS_TOKEN_EXPIRES = '15m';  // Corto
+const ACCESS_TOKEN_EXPIRES = '24h';  // Corto
 const REFRESH_TOKEN_DAYS = 9999999;        // Largo
 
 /**

@@ -1,18 +1,34 @@
 import mongoose from "mongoose";
-import { optional } from "zod/index.cjs";
 
 const userSchema = new mongoose.Schema(
     {
-        email: { type: String, unique: true },             // Único (index: unique), validado con Zod
+        email: {
+            type: String,
+            unique: true
+        },             // Único (index: unique), validado con Zod
         password: String,          // Cifrada con bcrypt
         name: String,              // Nombre
         lastName: String,          // Apellidos
         nif: String,               // Documento de identidad
-        role: { type: String, enum: ['admin', 'guest'], default: 'admin', index: true },
-        status: { type: String, enum: ['pending', 'verified'], default: 'pending', index: true },
+        role: {
+            type: String,
+            enum: ['admin', 'guest'],   // El campo enum lo que hace es que solo acepta esos dos valores
+            default: 'admin',
+            index: true
+        },
+        status: {
+            type: String,
+            enum: ['pending', 'verified'],
+            default: 'pending',
+            index: true
+        },
         verificationCode: String,  // Código aleatorio de 6 dígitos
         verificationAttempts: Number, // Intentos restantes (máximo 3)
-        company: { type: mongoose.Schema.Types.ObjectId, ref: 'Company', index: true },         // ref: 'Company' — se asigna en el onboarding (index)
+        company: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'Company',
+            index: true
+        },         // ref: 'Company' — se asigna en el onboarding (index)
         address: {
             street: String,
             number: String,
@@ -36,7 +52,6 @@ userSchema.virtual('fullName').get(function () {
     return `${this.name} ${this.lastName}`;
 });
 
-// Esto es como lo de arriba pero duplicado
 export interface UserInterface {
     _id: mongoose.Types.ObjectId;
     email: string;

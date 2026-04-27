@@ -32,8 +32,7 @@ refreshTokenSchema.methods.isActive = function (this: RefreshTokenInterface) {
     return !this.revoked && this.expiresAt > new Date();
 };
 
-// ???
-// const RefreshToken = mongoose.model('RefreshToken', refreshTokenSchema);
+// Esto es para que el modelo sepa qué campos hay
 export interface RefreshTokenInterface extends mongoose.Document {
     token: string;
     user: mongoose.Types.ObjectId | any;
@@ -43,5 +42,4 @@ export interface RefreshTokenInterface extends mongoose.Document {
     isActive(): boolean;
 }
 
-const RefreshToken = mongoose.model<RefreshTokenInterface>('RefreshToken', refreshTokenSchema);
-export default RefreshToken;
+export const RefreshToken = mongoose.model<RefreshTokenInterface>('RefreshToken', refreshTokenSchema);

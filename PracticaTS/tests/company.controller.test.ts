@@ -1,4 +1,4 @@
-import { jest } from '@jest/globals';
+import { jest, describe, expect, it, beforeEach } from '@jest/globals';
 import { AppError } from '../src/utils/AppError.js';
 
 // Mocks
@@ -15,8 +15,8 @@ const { createCompany, updateCompany, getCompanies, deleteCompany, editLogo } = 
 const { Company } = await import('../src/models/company.model.js');
 
 describe('Company Controller', () => {
-    let req: Request;
-    let res: Response;
+    let req: any;
+    let res: any;
 
     beforeEach(() => {
         req = {
@@ -36,7 +36,7 @@ describe('Company Controller', () => {
         it('debe crear una compañía correctamente', async () => {
             req.body = { name: 'Empresa Test', cif: 'B123456' };
             const mockCompany = { ...req.body, save: jest.fn() };
-            Company.create.mockResolvedValue(mockCompany);
+            (Company.create as any).mockResolvedValue(mockCompany);
 
             await createCompany(req, res);
 
@@ -48,7 +48,7 @@ describe('Company Controller', () => {
         });
 
         it('debe lanzar AppError.internal si hay error y es atrapado en el catch', async () => {
-            Company.create.mockRejectedValue(new Error('Mongoose Error'));
+            (Company.create as any).mockRejectedValue(new Error('Mongoose Error'));
             try {
                 await createCompany(req, res);
                 throw new Error('No debió resolverse');
@@ -62,7 +62,7 @@ describe('Company Controller', () => {
         it('debe actualizar la compañía', async () => {
             req.params.id = '123';
             req.body = { name: 'Nuevo nombre' };
-            Company.findByIdAndUpdate.mockResolvedValue(req.body);
+            (Company.findByIdAndUpdate as any).mockResolvedValue(req.body);
 
             await updateCompany(req, res);
 
@@ -72,7 +72,7 @@ describe('Company Controller', () => {
         });
 
         it('debe lanzar AppError en la actualización si falla la BD', async () => {
-            Company.findByIdAndUpdate.mockRejectedValue(new Error('Mongoose Error'));
+            (Company.findByIdAndUpdate as any).mockRejectedValue(new Error('Mongoose Error'));
             try {
                 await updateCompany(req, res);
                 throw new Error('Expected to throw');
@@ -85,7 +85,7 @@ describe('Company Controller', () => {
     describe('getCompanies', () => {
         it('debe devolver la lista de compañías', async () => {
             const arr = [{ name: 'Test1' }];
-            Company.find.mockResolvedValue(arr);
+            (Company.find as any).mockResolvedValue(arr);
 
             await getCompanies(req, res);
 
@@ -95,7 +95,7 @@ describe('Company Controller', () => {
         });
 
         it('debe lanzar error interno en el catch', async () => {
-            Company.find.mockRejectedValue(new Error('Mongoose Error'));
+            (Company.find as any).mockRejectedValue(new Error('Mongoose Error'));
             try {
                 await getCompanies(req, res);
                 throw new Error('Expected to throw');
@@ -108,7 +108,7 @@ describe('Company Controller', () => {
     describe('deleteCompany', () => {
         it('debe borrar una compañía por ID', async () => {
             req.params.id = '123';
-            Company.findByIdAndDelete.mockResolvedValue({ _id: '123' });
+            (Company.findByIdAndDelete as any).mockResolvedValue({ _id: '123' });
 
             await deleteCompany(req, res);
 
@@ -117,7 +117,7 @@ describe('Company Controller', () => {
         });
 
         it('debe atrapar error en delete', async () => {
-            Company.findByIdAndDelete.mockRejectedValue(new Error('Mongoose Error'));
+            (Company.findByIdAndDelete as any).mockRejectedValue(new Error('Mongoose Error'));
             try {
                 await deleteCompany(req, res);
                 throw new Error('Expected to throw');
@@ -158,7 +158,7 @@ describe('Company Controller', () => {
             req.file = { filename: 'dummy.png' };
             req.user = { company: { _id: 'company123' } };
             const expectedUrl = `${PUBLIC_URL}/uploads/dummy.png`;
-            Company.findByIdAndUpdate.mockResolvedValue({ logo: expectedUrl });
+            (Company.findByIdAndUpdate as any).mockResolvedValue({ logo: expectedUrl });
 
             await editLogo(req, res);
 
@@ -174,7 +174,7 @@ describe('Company Controller', () => {
         it('debe fallar si hay excepción en la actualización', async () => {
             req.file = { filename: 'dummy.png' };
             req.user = { company: { _id: 'company123' } };
-            Company.findByIdAndUpdate.mockRejectedValue(new Error('Mongoose Error'));
+            (Company.findByIdAndUpdate as any).mockRejectedValue(new Error('Mongoose Error'));
             try {
                 await editLogo(req, res);
                 throw new Error('Expected to throw');

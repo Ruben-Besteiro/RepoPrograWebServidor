@@ -2,7 +2,7 @@
 import { Request, Response } from 'express';
 import { User } from '../models/user.model.js';
 import { Company } from '../models/company.model.js';
-import RefreshToken from '../models/refreshToken.model.js';
+import { RefreshToken } from '../models/refreshToken.model.js';
 import { generateAccessToken, generateRefreshToken, getRefreshTokenExpiry } from '../utils/handleJwt.js';
 import { encrypt, compare } from '../utils/handlePassword.js';
 import { AppError } from '../utils/AppError.js';

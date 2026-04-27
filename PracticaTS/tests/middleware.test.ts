@@ -1,14 +1,14 @@
-import { jest } from '@jest/globals';
+import { describe, expect, it, beforeEach, jest } from '@jest/globals';
+import type { Request, Response, NextFunction } from 'express';
 import { AppError } from '../src/utils/AppError.js';
 import { checkRole } from '../src/middleware/role.middleware.js';
 import { notFound, errorHandler } from '../src/middleware/error.middleware.js';
 
 describe('Middlewares', () => {
-
     describe('role.middleware.js', () => {
-        let req: Request;
-        let res: Response;
-        let next: NextFunction;
+        let req: any;
+        let res: any;
+        let next: any;
 
         beforeEach(() => {
             req = { user: {} };
@@ -37,9 +37,9 @@ describe('Middlewares', () => {
     });
 
     describe('error.middleware.js', () => {
-        let req: Request;
-        let res: Response;
-        let next: NextFunction;
+        let req: any;
+        let res: any;
+        let next: any;
 
         beforeEach(() => {
             req = {};
@@ -51,7 +51,7 @@ describe('Middlewares', () => {
             req.originalUrl = '/ruta/falsa';
             notFound(req, res, next);
             expect(next).toHaveBeenCalled();
-            const calledArg = next.mock.calls[0][0];
+            const calledArg = (next as jest.Mock).mock.calls[0][0];
             expect(calledArg).toBeInstanceOf(Error);
         });
 

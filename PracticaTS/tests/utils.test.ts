@@ -1,3 +1,4 @@
+import { describe, expect, it, beforeAll } from '@jest/globals';
 import { AppError } from '../src/utils/AppError.js';
 
 describe('Utils: Password and JWT', () => {
