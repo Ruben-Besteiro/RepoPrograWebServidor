@@ -1,8 +1,17 @@
+// El escuchador escucha cuando algún controlador emite un evento
+// Por ejemplo cuando hacemos registro y es hora de mandar un correo
 import eventService from '../services/event.service.js';
+import { sendVerificationEmail } from '../services/mail.service.js';
 
 // Listener for user registered
-eventService.on('user:registered', (user) => {
+eventService.on('user:registered', async (user) => {
     console.log(`[EVENT] user:registered - User: ${user.fullName}, Email: ${user.email}`);
+
+    if (user.verificationCode) {
+        // Aquí llamamos al mail.service.ts
+        // Con esto se cumple lo de que el usuario está verificado cuando se le envía el correo
+        await sendVerificationEmail(user.email, user.verificationCode);
+    }
 });
 
 // Listener for user verified

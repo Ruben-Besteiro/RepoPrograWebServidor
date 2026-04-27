@@ -1,4 +1,4 @@
-@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2OWQwZTY4ZTkyMmFkYTE2NDY3YTM3OGIiLCJzZXNzaW9uSWQiOiI2OWVmNDY1YWZhNjI5ZmQzMjI1NDAzODQiLCJpYXQiOjE3NzcyODg3OTQsImV4cCI6MTc3NzM3NTE5NH0.cxghtEQCJLt7rCgcuWqvycvl_LHbiU3mNlneOUdWW1Q
+@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2OWVmN2ZhMDU1NzdmMjAwZDY0ZjExNjkiLCJzZXNzaW9uSWQiOiI2OWVmN2ZhMDU1NzdmMjAwZDY0ZjExNmIiLCJpYXQiOjE3NzczMDM0NTYsImV4cCI6MTc3NzM4OTg1Nn0.fO9kFAjF82mEr3VEZwAln1Q2pMX-Twr_3yQhByGtt_Q
 @refreshToken = 5f7db270eeb999aabe022fa3d1c0b6f84556684c05a910c0f8fcc73316e296a36406b27d001d2a48180c2084aef11f7fff1059629137401ca8aa054f25b13bd5
 // El token debe ir arriba
 
@@ -10,14 +10,15 @@ POST https://repoprograwebservidor-production.up.railway.app/api/user/register
 Content-Type: application/json
 
 {
-    "email": "willyrex@gmail.com",
-    "password": "QueVivaElMaincra69@",
-    "name": "Willy",
-    "lastName": "Rex",
-    "nif": "12345678A",
+    "email": "pacman@namco.com",
+    "password": "xdxdxdxd",
+    "name": "Pac",
+    "lastName": "Man",
+    "nif": "12345678X",
+    "role": "guest",
     "address": {
-        "street": "Calle Ñ",
-        "number": 123,
+        "street": "Calle WakaWaka",
+        "number": 2525,
         "postal": 28001,
         "city": "Madrid",
         "province": "Madrid"
@@ -30,7 +31,7 @@ Authorization: Bearer {{token}}
 Content-Type: application/json
 
 {
-    "verificationCode": 661561
+    "verificationCode": 758585
 }
 
 ### Login
@@ -39,8 +40,8 @@ POST https://repoprograwebservidor-production.up.railway.app/api/user/login
 Content-Type: application/json
 
 {
-    "email": "willyrex@gmail.com",
-    "password": "vetr7n8y0rvtey7n8cwty7n90wtrvy7n0c8y890ecnrtwy7new0ctv07ecwtnvy8"
+    "email": "admin@acme.com",
+    "password": "password123"
 }
 
 ### Actualizar el usuario que tiene el token

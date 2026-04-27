@@ -43,6 +43,7 @@ export const registerUser = async (req: Request, res: Response) => {
         const accessToken = generateAccessToken(user, storedRefreshToken.id);
 
         // Emitir evento de registro
+        // Esto lo escucha el user listener
         eventService.emit('user:registered', user);
 
         // No devolver la contraseña
