@@ -5,7 +5,7 @@ const options = {
     definition: {
         openapi: '3.0.3',
         info: {
-            title: 'API de Práctica - Documentación',
+            title: 'API de Práctica - Documentación Final',
             version: '1.0.0',
             description: 'API REST robusta desarrollada con node.js, express y mongoose, implementando seguridad avanzada y rate limiting.',
         },
@@ -98,11 +98,42 @@ const options = {
                         status: { type: 'string', example: 'error' },
                         message: { type: 'string', example: 'Descripción detallada del error' }
                     }
+                },
+                Client: {
+                    type: 'object',
+                    properties: {
+                        _id: { type: 'string', example: '60d0fe4f5311236168a109cc' },
+                        name: { type: 'string', example: 'Cliente S.A.' },
+                        cif: { type: 'string', example: 'A12345678' },
+                        email: { type: 'string', format: 'email', example: 'cliente@mail.com' },
+                        phone: { type: 'string', example: '912345678' },
+                        deleted: { type: 'boolean', example: false }
+                    }
+                },
+                Project: {
+                    type: 'object',
+                    properties: {
+                        _id: { type: 'string', example: '60d0fe4f5311236168a109cd' },
+                        name: { type: 'string', example: 'Proyecto Web' },
+                        projectCode: { type: 'string', example: 'PRJ-001' },
+                        active: { type: 'boolean', example: true },
+                        deleted: { type: 'boolean', example: false }
+                    }
+                },
+                DeliveryNote: {
+                    type: 'object',
+                    properties: {
+                        _id: { type: 'string', example: '60d0fe4f5311236168a109ce' },
+                        format: { type: 'string', enum: ['material', 'hours'] },
+                        description: { type: 'string' },
+                        workDate: { type: 'string', format: 'date' },
+                        signed: { type: 'boolean', example: false }
+                    }
                 }
             }
         }
     },
-    apis: ['./src/routes/*.js']
+    apis: ['./src/routes/*.ts', './src/routes/*.js']
 };
 
 export default swaggerJsdoc(options);

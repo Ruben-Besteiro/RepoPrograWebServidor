@@ -78,12 +78,6 @@ export const sendVerificationEmail = async (email: string, code: string) => {
         const errCode: string = error?.code ?? '';
         const responseCode: number | undefined = error?.responseCode;
 
-        if (error?.message?.includes('timeout')) {
-            console.error(
-                `❌ [MAIL] TIMEOUT — sendMail no completó en ${SEND_MAIL_TIMEOUT_MS}ms.` +
-                `Posibles causas: firewall bloqueando puerto ${process.env.SMTP_PORT}, SMTP_HOST incorrecto, o el servidor no responde.`
-            );
-        }
         if (errCode === 'ECONNREFUSED') {
             console.error(
                 `❌ [MAIL] ECONNREFUSED — No se pudo conectar a ` +
@@ -106,6 +100,12 @@ export const sendVerificationEmail = async (email: string, code: string) => {
             console.error(
                 `❌ [MAIL] Error SMTP ${responseCode} — Respuesta del servidor: ` +
                 `${error?.response ?? '(sin respuesta)'}`
+            );
+        }
+        if (error?.message?.includes('timeout')) {
+            console.error(
+                `❌ [MAIL] TIMEOUT — sendMail no completó en ${SEND_MAIL_TIMEOUT_MS}ms.` +
+                `Posibles causas: firewall bloqueando puerto ${process.env.SMTP_PORT}, SMTP_HOST incorrecto, o el servidor no responde.`
             );
         }
         else {
