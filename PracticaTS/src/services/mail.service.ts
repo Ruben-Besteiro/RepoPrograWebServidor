@@ -16,6 +16,9 @@ const transporter = nodemailer.createTransport({
 
 // Esta es la función que manda el correo
 export const sendVerificationEmail = async (email: string, code: string) => {
+    console.log(`[MAIL] sendVerificationEmail called for: ${email}`);
+    console.log(`[MAIL] SMTP config - Host: ${process.env.SMTP_HOST || '(not set, using smtp.ethereal.email)'}, Port: ${process.env.SMTP_PORT || '(not set, using 587)'}, User: ${process.env.SMTP_USER || '(not set)'}`);
+
     try {
         const info = await transporter.sendMail({
             from: '"Sistema de Verificación" <no-reply@miapi.com>',
@@ -37,10 +40,11 @@ export const sendVerificationEmail = async (email: string, code: string) => {
         console.log("✉️ Email enviado: %s", info.messageId);
 
         // Si usamos ethereal.email, nos da una URL para ver el correo
-        if (info.envelope && info.envelope.from === 'smtp.ethereal.email') {
+        // La comprobación correcta es sobre el host configurado, no sobre info.envelope.from
+        if (process.env.SMTP_HOST === 'smtp.ethereal.email' || !process.env.SMTP_HOST) {
             console.log("🔗 Ver email en: %s", nodemailer.getTestMessageUrl(info));
         }
     } catch (error) {
-        console.error("❌ Error enviando email:", error);
+        console.error("❌ Error enviando email:", error instanceof Error ? error.stack : error);
     }
 };
