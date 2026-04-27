@@ -1,4 +1,4 @@
-import { jest } from '@jest/globals';
+import { jest, describe, expect, it, beforeEach } from '@jest/globals';
 import { AppError } from '../src/utils/AppError.js';
 
 jest.unstable_mockModule('../src/models/user.model.js', () => ({
@@ -20,7 +20,7 @@ jest.unstable_mockModule('../src/models/company.model.js', () => ({
 }));
 
 jest.unstable_mockModule('../src/models/refreshToken.model.js', () => ({
-    default: {
+    RefreshToken: {
         create: jest.fn(),
         findOne: jest.fn(),
         updateMany: jest.fn()
@@ -34,8 +34,8 @@ jest.unstable_mockModule('../src/utils/handleJwt.js', () => ({
 }));
 
 jest.unstable_mockModule('../src/utils/handlePassword.js', () => ({
-    encrypt: jest.fn().mockResolvedValue('hashedPassword'),
-    compare: jest.fn().mockResolvedValue(true)
+    encrypt: (jest.fn() as any).mockResolvedValue('hashedPassword'),
+    compare: (jest.fn() as any).mockResolvedValue(true)
 }));
 
 jest.unstable_mockModule('../src/services/event.service.js', () => ({
@@ -46,14 +46,14 @@ jest.unstable_mockModule('../src/services/event.service.js', () => ({
 
 const { registerUser, verifyUser, loginUser, updateUser, changePassword, getAllUsers, getMe, refreshTokenCtrl, logoutUser, revokeAllTokens, deleteUser, restoreUser, onboardUser, inviteUser } = await import('../src/controllers/user.controller.js');
 const { User } = await import('../src/models/user.model.js');
-const RefreshToken = (await import('../src/models/refreshToken.model.js')).default;
+const { RefreshToken } = await import('../src/models/refreshToken.model.js');
 const { encrypt, compare } = await import('../src/utils/handlePassword.js');
 const { Company } = await import('../src/models/company.model.js');
 const { default: eventService } = await import('../src/services/event.service.js');
 
 describe('User Controller', () => {
-    let req: Request;
-    let res: Response;
+    let req: any;
+    let res: any;
 
     beforeEach(() => {
         req = { body: {}, params: {}, query: {}, user: {} };
@@ -64,7 +64,7 @@ describe('User Controller', () => {
     describe('registerUser', () => {
         it('debe abortar si el email ya existe', async () => {
             req.body = { email: 'test@test.com' };
-            User.findOne.mockResolvedValue({});
+            (User.findOne as any).mockResolvedValue({});
             try {
                 await registerUser(req, res);
             } catch (e) {
@@ -74,15 +74,15 @@ describe('User Controller', () => {
 
         it('debe registrar un usuario, hashear password y generar tokens', async () => {
             req.body = { email: 'new@test.com', password: '123' };
-            User.findOne.mockResolvedValue(null);
+            (User.findOne as any).mockResolvedValue(null);
             const mockSavedUser = { _id: 'user1', email: 'new@test.com', password: 'hashed', toObject: () => ({ _id: 'user1' }) };
-            User.create.mockResolvedValue(mockSavedUser);
-            RefreshToken.create.mockResolvedValue({ _id: 'rt1' });
+            (User.create as any).mockResolvedValue(mockSavedUser);
+            (RefreshToken.create as any).mockResolvedValue({ _id: 'rt1' });
 
             await registerUser(req, res);
 
-            expect(encrypt).toHaveBeenCalledWith('123');
-            expect(User.create).toHaveBeenCalled();
+            expect(encrypt as jest.Mock).toHaveBeenCalledWith('123');
+            expect(User.create as jest.Mock).toHaveBeenCalled();
             expect(res.status).toHaveBeenCalledWith(201);
             expect(res.json).toHaveBeenCalled();
         });
@@ -92,20 +92,20 @@ describe('User Controller', () => {
         it('debe devolver tokens validando la password', async () => {
             req.body = { email: 'a@a.com', password: '123' };
             const mockUser = { _id: 'user1', password: 'hashed', toObject: () => ({ _id: 'user1' }) };
-            User.findOne.mockResolvedValue(mockUser);
-            compare.mockResolvedValue(true);
-            RefreshToken.create.mockResolvedValue({ _id: 'rt1' });
+            (User.findOne as any).mockResolvedValue(mockUser);
+            (compare as any).mockResolvedValue(true);
+            (RefreshToken.create as any).mockResolvedValue({ _id: 'rt1' });
 
             await loginUser(req, res);
 
-            expect(compare).toHaveBeenCalledWith('123', 'hashed');
+            expect(compare as jest.Mock).toHaveBeenCalledWith('123', 'hashed');
             expect(res.status).toHaveBeenCalledWith(200);
         });
 
         it('debe fallar si contraseña no coincide', async () => {
             req.body = { email: 'a@a.com', password: '123' };
-            User.findOne.mockResolvedValue({});
-            compare.mockResolvedValue(false);
+            (User.findOne as any).mockResolvedValue({});
+            (compare as any).mockResolvedValue(false);
 
             try {
                 await loginUser(req, res);
@@ -120,23 +120,23 @@ describe('User Controller', () => {
             req.query = { soft: 'true' };
             req.body = { id: 'user1' };
             const mockUser = { _id: 'user1', deleted: false, save: jest.fn() };
-            User.findById.mockResolvedValue(mockUser);
+            (User.findById as any).mockResolvedValue(mockUser);
 
             await deleteUser(req, res);
 
             expect(mockUser.deleted).toBe(true);
-            expect(mockUser.save).toHaveBeenCalled();
+            expect(mockUser.save as jest.Mock).toHaveBeenCalled();
         });
 
         it('debe intentar hard delete', async () => {
             req.query = { soft: 'false' };
             req.body = { id: 'user1' };
-            User.findById.mockResolvedValue({});
-            User.findByIdAndDelete.mockResolvedValue({ _id: 'user1' });
+            (User.findById as any).mockResolvedValue({});
+            (User.findByIdAndDelete as any).mockResolvedValue({ _id: 'user1' });
 
             await deleteUser(req, res);
 
-            expect(User.findByIdAndDelete).toHaveBeenCalledWith('user1');
+            expect(User.findByIdAndDelete as jest.Mock).toHaveBeenCalledWith('user1');
         });
     });
 
@@ -144,7 +144,7 @@ describe('User Controller', () => {
         it('debe vincular a compañía', async () => {
             req.body = { company: 'comp1' };
             req.user = { _id: 'user1', save: jest.fn() };
-            Company.findById.mockResolvedValue({ _id: 'comp1', isFreelance: false });
+            (Company.findById as any).mockResolvedValue({ _id: 'comp1', isFreelance: false });
 
             await onboardUser(req, res);
 
@@ -155,12 +155,12 @@ describe('User Controller', () => {
         it('debe crear compañía freelance', async () => {
             req.body = {};
             req.user = { _id: 'user1', save: jest.fn() };
-            Company.findById.mockResolvedValue(null);
-            Company.create.mockResolvedValue({ _id: 'newComp' });
+            (Company.findById as any).mockResolvedValue(null);
+            (Company.create as any).mockResolvedValue({ _id: 'newComp' });
 
             await onboardUser(req, res);
 
-            expect(Company.create).toHaveBeenCalled();
+            expect(Company.create as jest.Mock).toHaveBeenCalled();
             expect(req.user.role).toBe('admin');
         });
     });
@@ -168,9 +168,9 @@ describe('User Controller', () => {
     describe('refreshTokenCtrl', () => {
         it('debe revocar y emitir tokens', async () => {
             req.body = { refreshToken: 'oldToken' };
-            const storedToken = { token: 'oldToken', isActive: () => true, save: jest.fn(), user: { _id: 'u1' } };
-            RefreshToken.findOne.mockReturnValue({ populate: jest.fn().mockResolvedValue(storedToken) });
-            RefreshToken.create.mockResolvedValue({ _id: 'newId' });
+            const storedToken: any = { token: 'oldToken', isActive: () => true, save: jest.fn(), user: { _id: 'u1' }, revoked: false };
+            (RefreshToken.findOne as any).mockReturnValue({ populate: (jest.fn() as any).mockResolvedValue(storedToken) });
+            (RefreshToken.create as any).mockResolvedValue({ _id: 'newId' });
 
             await refreshTokenCtrl(req, res);
 
@@ -180,7 +180,7 @@ describe('User Controller', () => {
 
     describe('getAllUsers', () => {
         it('devuelve todos exceptuando borrados', async () => {
-            User.find.mockReturnValue({ populate: jest.fn().mockReturnValue({ select: jest.fn().mockResolvedValue([{ name: 'Test' }]) }) });
+            (User.find as any).mockReturnValue({ populate: (jest.fn() as any).mockReturnValue({ select: (jest.fn() as any).mockResolvedValue([{ name: 'Test' }]) }) });
             await getAllUsers(req, res);
             expect(res.status).toHaveBeenCalledWith(200);
         });
@@ -194,8 +194,8 @@ describe('User Controller', () => {
 
         it('excede intentos y borra', async () => {
             req.user = { _id: 'user1', status: 'pending', verificationAttempts: 2, save: jest.fn() };
-            User.findByIdAndDelete.mockResolvedValue({});
-            eventService.emit.mockReturnValue(true);
+            (User.findByIdAndDelete as any).mockResolvedValue({});
+            (eventService as any).emit.mockReturnValue(true);
             try { await verifyUser(req, res); } catch (e) { expect(e).toBeInstanceOf(AppError); }
         });
 
@@ -225,7 +225,8 @@ describe('User Controller', () => {
         it('actualiza datos', async () => {
             req.body = { name: 'New' };
             req.user = { _id: 'u1' };
-            User.findById.mockReturnValue({ populate: jest.fn().mockResolvedValue({ save: jest.fn(), populate: jest.fn(), toObject: () => ({}) }) });
+            const mockUpdateResult = { save: jest.fn(), populate: jest.fn(), toObject: () => ({}) };
+            (User.findById as any).mockReturnValue({ populate: (jest.fn() as any).mockResolvedValue(mockUpdateResult) });
             await updateUser(req, res);
             expect(res.status).toHaveBeenCalledWith(200);
         });
@@ -235,8 +236,8 @@ describe('User Controller', () => {
         it('cambia contraseña', async () => {
             req.body = { password: 'new', oldPassword: 'old' };
             req.user = { _id: 'u1' };
-            User.findById.mockResolvedValue({ password: 'oldHashed', save: jest.fn() });
-            compare.mockResolvedValue(true);
+            (User.findById as any).mockResolvedValue({ password: 'oldHashed', save: jest.fn() });
+            (compare as any).mockResolvedValue(true);
             await changePassword(req, res);
             expect(res.status).toHaveBeenCalledWith(200);
         });
@@ -246,7 +247,7 @@ describe('User Controller', () => {
         it('revoca token actual', async () => {
             req.body = { refreshToken: '123' };
             const mockToken = { revoked: false, save: jest.fn() };
-            RefreshToken.findOne.mockResolvedValue(mockToken);
+            (RefreshToken.findOne as any).mockResolvedValue(mockToken);
             await logoutUser(req, res);
             expect(mockToken.revoked).toBe(true);
         });
@@ -255,17 +256,41 @@ describe('User Controller', () => {
     describe('revokeAllTokens', () => {
         it('revoca todos', async () => {
             req.user = { _id: 'u1' };
-            RefreshToken.updateMany.mockResolvedValue({});
+            (RefreshToken.updateMany as any).mockResolvedValue({});
             await revokeAllTokens(req, res);
-            expect(RefreshToken.updateMany).toHaveBeenCalled();
+            expect(RefreshToken.updateMany as jest.Mock).toHaveBeenCalled();
         });
     });
 
     describe('restoreUser', () => {
         it('restaura usuario', async () => {
             req.body = { id: 'u1' };
-            User.findById.mockResolvedValue({ deleted: true, save: jest.fn() });
+            (User.findById as any).mockResolvedValue({ deleted: true, save: jest.fn() });
             await restoreUser(req, res);
+            expect(res.status).toHaveBeenCalledWith(200);
+        });
+
+        it('falla si ya está restaurado', async () => {
+            req.body = { id: 'u1' };
+            (User.findById as any).mockResolvedValue({ deleted: false });
+            await expect(restoreUser(req, res)).rejects.toThrow('USER_ALREADY_RESTORED');
+        });
+    });
+
+    describe('onboardUser', () => {
+        it('falla si es freelance de otro', async () => {
+            req.user = { _id: 'u1' };
+            req.body = { company: 'c1' };
+            (Company.findById as any).mockResolvedValue({ _id: 'c1', isFreelance: true, owner: 'u2' });
+            await expect(onboardUser(req, res)).rejects.toThrow('COMPANY_IS_FREELANCE');
+        });
+
+        it('crea nueva compañía si no existe', async () => {
+            req.user = { _id: 'u1', name: 'N', nif: '1', address: 'A', save: jest.fn() };
+            req.body = {};
+            (Company.create as any).mockResolvedValue({ _id: 'new' });
+            await onboardUser(req, res);
+            expect(Company.create).toHaveBeenCalled();
             expect(res.status).toHaveBeenCalledWith(200);
         });
     });
@@ -274,10 +299,25 @@ describe('User Controller', () => {
         it('invita nuevo usuario', async () => {
             req.user = { company: { _id: 'c1' } };
             req.body = { email: 'a@a' };
-            User.findOne.mockResolvedValue(null);
-            User.create.mockResolvedValue({});
+            (User.findOne as any).mockResolvedValue(null);
+            (User.create as any).mockResolvedValue({});
             await inviteUser(req, res);
             expect(res.status).toHaveBeenCalledWith(200);
+        });
+
+        it('falla si el admin no tiene compañía', async () => {
+            req.user = { company: null };
+            await expect(inviteUser(req, res)).rejects.toThrow('USER_HAS_NO_COMPANY');
+        });
+
+        it('invita usuario que ya existe', async () => {
+            req.user = { company: { _id: 'c1' } };
+            req.body = { email: 'exists@mail.com' };
+            const existingUser = { _id: 'uEx', save: jest.fn() };
+            (User.findOne as any).mockResolvedValue(existingUser);
+            await inviteUser(req, res);
+            expect(res.status).toHaveBeenCalledWith(200);
+            expect(existingUser.save).toHaveBeenCalled();
         });
     });
 });

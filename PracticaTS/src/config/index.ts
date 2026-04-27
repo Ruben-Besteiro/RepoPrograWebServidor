@@ -5,10 +5,10 @@ import dns from 'dns';
 dns.setServers(['8.8.8.8', '8.8.4.4']);   // Esto de aquí es obligatorio para resolver el problema del ECONNREFUSED
 
 const dbConnect = async () => {
-    const DATABASE_URI = process.env.DB_URI;
+    const DATABASE_URI = process.env.MONGO_URL;
 
     if (!DATABASE_URI) {
-        console.error('❌ DB_URI no está definida en .env');
+        console.error('❌ MONGO_URL no está definida en .env');
         process.exit(1);
     }
 

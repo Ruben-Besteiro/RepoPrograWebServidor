@@ -2,7 +2,10 @@ import mongoose from "mongoose";
 
 const companySchema = new mongoose.Schema(
     {
-        owner: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+        owner: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'User'
+        },
         name: String,
         cif: String,
         address: {
@@ -24,8 +27,6 @@ const companySchema = new mongoose.Schema(
     }
 );
 
-// Al igual que en el user model, aquí hay una duplicación
-// export const Company = mongoose.model('Company', companySchema);
 export interface CompanyInterface extends mongoose.Document {
     owner: mongoose.Types.ObjectId;
     name: string;

@@ -1,6 +1,7 @@
 import request from 'supertest';
 import { MongoMemoryServer } from 'mongodb-memory-server';
 import mongoose from 'mongoose';
+import { afterAll, beforeAll, describe, expect, it } from '@jest/globals';
 
 let mongoServer: any;
 let app: any;
@@ -9,7 +10,7 @@ beforeAll(async () => {
     // Iniciar BD en memoria volátil 
     mongoServer = await MongoMemoryServer.create();
     const mongoUri = mongoServer.getUri();
-    process.env.DB_URI = mongoUri;
+    process.env.MONGO_URL = mongoUri;
     process.env.NODE_ENV = 'test';
     process.env.JWT_SECRET = 'supersecret';
 
@@ -37,7 +38,7 @@ describe('Integración y E2E Rutas', () => {
     });
 
     // Pequeño flujo de Test E2E
-    let accessToken;
+    let accessToken: string;
 
     it('debe registrar un usuario real y enrutar a user.controller', async () => {
         const res = await request(app)
@@ -65,7 +66,7 @@ describe('Integración y E2E Rutas', () => {
 
     it('debe acceder al perfil protegido con el token válido tras verificar el usuario', async () => {
         // Obtenemos el code de la base de datos
-        const dbUser = await mongoose.connection.collection('users').findOne({ email: 'test@mail.com' });
+        const dbUser = await mongoose.connection.collection('users').findOne({ email: 'test@mail.com' }) as any;
 
         await request(app)
             .put('/api/user/verify')

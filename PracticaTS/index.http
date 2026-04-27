@@ -1,9 +1,12 @@
-@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2OWQwZTY4ZTkyMmFkYTE2NDY3YTM3OGIiLCJzZXNzaW9uSWQiOiI2OWRhODA0NDJlZGQ3MmMzNjM4M2VjZDkiLCJpYXQiOjE3NzU5MjczNjQsImV4cCI6MTc3NTkyODI2NH0.6oENuap_scaqTFEGojC0TxNdX40Tvoaewb94BBbvpvQ
+@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2OWQwZTY4ZTkyMmFkYTE2NDY3YTM3OGIiLCJzZXNzaW9uSWQiOiI2OWVmNDY1YWZhNjI5ZmQzMjI1NDAzODQiLCJpYXQiOjE3NzcyODg3OTQsImV4cCI6MTc3NzM3NTE5NH0.cxghtEQCJLt7rCgcuWqvycvl_LHbiU3mNlneOUdWW1Q
 @refreshToken = 5f7db270eeb999aabe022fa3d1c0b6f84556684c05a910c0f8fcc73316e296a36406b27d001d2a48180c2084aef11f7fff1059629137401ca8aa054f25b13bd5
 // El token debe ir arriba
 
+### Health Check
+GET https://repoprograwebservidor-production.up.railway.app:3000/health
+
 ### Registrar usuario (hay que verificarlo) (por defecto es admin)
-POST http://localhost:3000/api/user/register
+POST https://repoprograwebservidor-production.up.railway.app:3000/api/user/register
 Content-Type: application/json
 
 {
@@ -22,7 +25,7 @@ Content-Type: application/json
 }
 
 ### Verificar al usuario que tiene el token
-PUT http://localhost:3000/api/user/verify
+PUT https://repoprograwebservidor-production.up.railway.app:3000/api/user/verify
 Authorization: Bearer {{token}}
 Content-Type: application/json
 
@@ -32,7 +35,7 @@ Content-Type: application/json
 
 ### Login
 ### No utiliza el token ni tampoco ningún middleware
-POST http://localhost:3000/api/user/login
+POST https://repoprograwebservidor-production.up.railway.app:3000/api/user/login
 Content-Type: application/json
 
 {
@@ -43,7 +46,7 @@ Content-Type: application/json
 ### Actualizar el usuario que tiene el token
 ### PUT normalmente borra los campos que faltan
 ### pero aquí no porque estoy usando Object.assign
-PUT http://localhost:3000/api/user
+PUT https://repoprograwebservidor-production.up.railway.app:3000/api/user
 Authorization: Bearer {{token}}
 Content-Type: application/json
 
@@ -61,7 +64,7 @@ Content-Type: application/json
 }
 
 ### Cambiar solo la contraseña de un usuario
-PATCH http://localhost:3000/api/user/password
+PATCH https://repoprograwebservidor-production.up.railway.app:3000/api/user/password
 Authorization: Bearer {{token}}
 Content-Type: application/json
 
@@ -73,7 +76,7 @@ Content-Type: application/json
 ### Meter a un usuario en una compañía
 ### Si el ID no existe, crea una compañía freelance
 ### Pero si sí existe, el usuario pasa a ser guest
-PATCH http://localhost:3000/api/user/company
+PATCH https://repoprograwebservidor-production.up.railway.app:3000/api/user/company
 Authorization: Bearer {{token}}
 Content-Type: application/json
 
@@ -82,16 +85,16 @@ Content-Type: application/json
 }
 
 ### Obtener usuarios (ruta protegida)
-GET http://localhost:3000/api/user
+GET https://repoprograwebservidor-production.up.railway.app:3000/api/user
 Authorization: Bearer {{token}}
 
 ### Obtener los datos del usuario que tiene el token
-GET http://localhost:3000/api/user/me
+GET https://repoprograwebservidor-production.up.railway.app:3000/api/user/me
 Authorization: Bearer {{token}}
 
 
 ### Refrescar el access token
-POST http://localhost:3000/api/user/refresh
+POST https://repoprograwebservidor-production.up.railway.app:3000/api/user/refresh
 Content-Type: application/json
 
 {
@@ -99,7 +102,7 @@ Content-Type: application/json
 }
 
 ### Cerrar sesión (manda a tomar por culo ambos tokens)
-POST http://localhost:3000/api/user/logout
+POST https://repoprograwebservidor-production.up.railway.app:3000/api/user/logout
 Authorization: Bearer {{token}}
 Content-Type: application/json
 
@@ -108,7 +111,7 @@ Content-Type: application/json
 }
 
 ### Cerrar todas las sesiones (necesita accessToken)
-POST http://localhost:3000/api/user/logout-all
+POST https://repoprograwebservidor-production.up.railway.app:3000/api/user/logout-all
 Authorization: Bearer {{token}}
 
 ### Borrar usuario por ID
@@ -121,7 +124,7 @@ Authorization: Bearer {{token}}
 #}
 
 ### Soft delete
-DELETE http://localhost:3000/api/user?soft=true
+DELETE https://repoprograwebservidor-production.up.railway.app:3000/api/user?soft=true
 Authorization: Bearer {{token}}
 Content-Type: application/json
 
@@ -130,7 +133,7 @@ Content-Type: application/json
 }
 
 ### Restaurar un usuario que fue soft deleteado
-PUT http://localhost:3000/api/user/restore
+PUT https://repoprograwebservidor-production.up.railway.app:3000/api/user/restore
 Authorization: Bearer {{token}}
 Content-Type: application/json
 
@@ -139,7 +142,7 @@ Content-Type: application/json
 }
 
 ### Crear compañía (ruta protegida)
-POST http://localhost:3000/api/company
+POST https://repoprograwebservidor-production.up.railway.app:3000/api/company
 Authorization: Bearer {{token}}
 Content-Type: application/json
 
@@ -156,7 +159,7 @@ Content-Type: application/json
 }
 
 ### Actualizar compañía (ruta protegida)
-PUT http://localhost:3000/api/company/69d0dbd364ffef7c376a4d4c
+PUT https://repoprograwebservidor-production.up.railway.app:3000/api/company/69d0dbd364ffef7c376a4d4c
 Authorization: Bearer {{token}}
 Content-Type: application/json
 
@@ -174,7 +177,7 @@ Content-Type: application/json
 
 ### Subir el logo de la compañía con Multer
 ### Esto lo que hace es coger el archivo de Content-Disposition y guardarlo en storage
-PATCH http://localhost:3000/api/company/logo
+PATCH https://repoprograwebservidor-production.up.railway.app:3000/api/company/logo
 Authorization: Bearer {{token}}
 Content-Type: multipart/form-data; boundary=----WebKitFormBoundary
 
@@ -186,21 +189,21 @@ Content-Type: image/png
 ------WebKitFormBoundary--
 
 ### Obtener compañías (ruta protegida)
-GET http://localhost:3000/api/company
+GET https://repoprograwebservidor-production.up.railway.app:3000/api/company
 Authorization: Bearer {{token}}
 
 ### Soft delete de la compañía (ruta protegida)
-DELETE http://localhost:3000/api/company/69d0dbd364ffef7c376a4d4c?soft=true
+DELETE https://repoprograwebservidor-production.up.railway.app:3000/api/company/69d0dbd364ffef7c376a4d4c?soft=true
 Authorization: Bearer {{token}}
 
 ### Hard delete de la compañía (ruta protegida)
-DELETE http://localhost:3000/api/company/69d0dbd364ffef7c376a4d4c?soft=false
+DELETE https://repoprograwebservidor-production.up.railway.app:3000/api/company/69d0dbd364ffef7c376a4d4c?soft=false
 Authorization: Bearer {{token}}
 
 ### Invitar a un usuario
 ### Consiste en crear un nuevo usuario con los datos del JSON y meterle en la compañía del usuario que tiene el token
 ### El que invita debe ser admin
-POST http://localhost:3000/api/user/invite
+POST https://repoprograwebservidor-production.up.railway.app:3000/api/user/invite
 Authorization: Bearer {{token}}
 Content-Type: application/json
 
@@ -217,3 +220,137 @@ Content-Type: application/json
         "province": "Madrid"
     }
 }
+
+###########################################################################
+### A partir de aquí es la práctica final
+
+### Crear cliente
+### No puede haber un cliente con el mismo CIF en esa compañía
+POST https://repoprograwebservidor-production.up.railway.app:3000/api/client
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+    "name": "Cliente 1",
+    "cif": "C1",
+    "email": "cliente@cliente.com",
+    "phone": "123456789",
+    "address": {
+        "street": "Calle 1",
+        "number": 1,
+        "postal": "12345",
+        "city": "Ciudad 1",
+        "province": "Provincia 1"
+    }
+}
+
+### Actualizar un cliente por ID
+PATCH https://repoprograwebservidor-production.up.railway.app:3000/api/client/69ee0eac2b5a55f20eed61ba
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+    "name": "Cliente 1 Actualizado",
+    "email": "clienteactualizado@clienteactualizado.com"
+}
+
+### Obtener todos los clientes
+GET https://repoprograwebservidor-production.up.railway.app:3000/api/client
+Authorization: Bearer {{token}}
+
+### Obtener un cliente por ID
+GET https://repoprograwebservidor-production.up.railway.app:3000/api/client/69edf0d72b5a55f20eed61a9
+Authorization: Bearer {{token}}
+
+### Borrar un cliente
+DELETE https://repoprograwebservidor-production.up.railway.app:3000/api/client/69ee0eac2b5a55f20eed61ba
+Authorization: Bearer {{token}}
+
+### Archivar un cliente (soft delete)
+PATCH https://repoprograwebservidor-production.up.railway.app:3000/api/client/69edf0d72b5a55f20eed61a9/archive
+Authorization: Bearer {{token}}
+
+### Restaurar un cliente archivado
+PATCH https://repoprograwebservidor-production.up.railway.app:3000/api/client/69edf0d72b5a55f20eed61a9/restore
+Authorization: Bearer {{token}}
+
+### Obtener solo los clientes archivados
+GET https://repoprograwebservidor-production.up.railway.app:3000/api/client/archived
+Authorization: Bearer {{token}}
+
+
+### Crear proyecto
+### Tanto el usuario que lo creó como el cliente deben ser de la misma compañía
+POST https://repoprograwebservidor-production.up.railway.app:3000/api/project
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+    "name": "Proyecto 1",
+    "projectCode": "P1",
+    "client": "69edf0d72b5a55f20eed61a9",
+    "email": "proyecto2@maincra.com",
+    "notes": "qwertyuiopasdfghjklñzxcvbnm"
+}
+
+### Actualizar proyecto
+PATCH https://repoprograwebservidor-production.up.railway.app:3000/api/project/69ee0eac2b5a55f20eed61bc
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+    "name": "Proyecto 1 Actualizado",
+    "client": "69ee0eac2b5a55f20eed61ba"
+}
+
+### Obtener todos los proyectos
+GET https://repoprograwebservidor-production.up.railway.app:3000/api/project
+Authorization: Bearer {{token}}
+
+### Obtener un proyecto por ID
+GET https://repoprograwebservidor-production.up.railway.app:3000/api/project/69ee2438ae9477fa1b3e3444
+Authorization: Bearer {{token}}
+
+### Borrar un proyecto
+DELETE https://repoprograwebservidor-production.up.railway.app:3000/api/project/69ee2438ae9477fa1b3e3444
+Authorization: Bearer {{token}}
+
+### Archivar un proyecto (soft delete)
+PATCH https://repoprograwebservidor-production.up.railway.app:3000/api/project/69ee2438ae9477fa1b3e3444/archive
+Authorization: Bearer {{token}}
+
+### Restaurar un proyecto eliminado
+PATCH https://repoprograwebservidor-production.up.railway.app:3000/api/project/69ee2438ae9477fa1b3e3444/restore
+Authorization: Bearer {{token}}
+
+### Obtener solo los proyectos archivados
+GET https://repoprograwebservidor-production.up.railway.app:3000/api/project/archived
+Authorization: Bearer {{token}}
+
+
+### Crear albarán
+POST https://repoprograwebservidor-production.up.railway.app:3000/api/deliveryNote
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+    "client": "69edf0d72b5a55f20eed61a9",
+    "project": "69ee2438ae9477fa1b3e3444",
+    "format": "material"
+}
+
+### Firmar (actualizar) un albarán
+PATCH https://repoprograwebservidor-production.up.railway.app:3000/api/deliveryNote/69ee3ed7801772767d1c27fa
+Authorization: Bearer {{token}}
+
+### Obtener todos los albaranes
+GET https://repoprograwebservidor-production.up.railway.app:3000/api/deliveryNote?signed=false
+Authorization: Bearer {{token}}
+
+### Obtener un albarán por ID
+GET https://repoprograwebservidor-production.up.railway.app:3000/api/deliveryNote/69ee3ed7801772767d1c27fa
+Authorization: Bearer {{token}}
+
+### Borrar un albarán (aquí no hay soft delete)
+DELETE https://repoprograwebservidor-production.up.railway.app:3000/api/deliveryNote/69ee3ed7801772767d1c27fa
+Authorization: Bearer {{token}}

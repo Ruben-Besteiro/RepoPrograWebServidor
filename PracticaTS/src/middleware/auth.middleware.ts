@@ -1,7 +1,8 @@
 import { verifyAccessToken } from '../utils/handleJwt.js';
 import { User } from '../models/user.model.js';
 import { AppError } from '../utils/AppError.js';
-import RefreshToken from '../models/refreshToken.model.js';
+import { RefreshToken } from '../models/refreshToken.model.js';
+import { NextFunction, Request, Response } from 'express';
 
 /**
  * Middleware de autenticación y verificación (JWT)
@@ -10,7 +11,7 @@ import RefreshToken from '../models/refreshToken.model.js';
  */
 // Comprueba que el token es válido y que el usuario está verificado
 // Pero si estamos usando el /verify, entonces nos saltamos la comprobación de verificación
-export const authMiddleware = (requireVerification = true) => async (req, res, next) => {
+export const authMiddleware = (requireVerification = true) => async (req: Request, res: Response, next: NextFunction) => {
     try {
         if (!req.headers.authorization) {
             throw AppError.unauthorized('NOT_AUTHENTICATED');
@@ -18,7 +19,7 @@ export const authMiddleware = (requireVerification = true) => async (req, res, n
         }
 
         const token = req.headers.authorization.split(' ').pop(); // Bearer <TOKEN>
-        const dataToken = verifyAccessToken(token);
+        const dataToken = verifyAccessToken(token as string);
 
         if (!dataToken) {
             throw AppError.unauthorized('INVALID_TOKEN');
