@@ -3,24 +3,53 @@
 // El que decide cuándo ocurrirá eso es el escuchador y también el controlador
 import nodemailer from 'nodemailer';
 
+// Timeout en ms para la llamada a sendMail — evita que se quede colgada indefinidamente
+const SEND_MAIL_TIMEOUT_MS = 10_000;
+
 // Esto es un usuario de prueba que crea Ethereal Email para mandar correos
 // Luego en el codigo real deberemos usar GMAIL, etc.
 const transporter = nodemailer.createTransport({
     host: process.env.SMTP_HOST || 'smtp.ethereal.email',
     port: Number(process.env.SMTP_PORT) || 587,
+    secure: false,          // true sólo para puerto 465; 587 usa STARTTLS
     auth: {
         user: process.env.SMTP_USER,
         pass: process.env.SMTP_PASS,
     },
+    connectionTimeout: SEND_MAIL_TIMEOUT_MS,
+    greetingTimeout: SEND_MAIL_TIMEOUT_MS,
+    socketTimeout: SEND_MAIL_TIMEOUT_MS,
 });
+
+// Envuelve sendMail en una Promise.race con un timeout explícito para que
+// nunca se quede colgada más de SEND_MAIL_TIMEOUT_MS milisegundos.
+const sendMailWithTimeout = (options: nodemailer.SendMailOptions): Promise<nodemailer.SentMessageInfo> => {
+    const sendPromise = transporter.sendMail(options);
+
+    const timeoutPromise = new Promise<never>((_, reject) =>
+        setTimeout(
+            () => reject(new Error(`sendMail timeout after ${SEND_MAIL_TIMEOUT_MS}ms — el servidor SMTP no respondió`)),
+            SEND_MAIL_TIMEOUT_MS
+        )
+    );
+
+    return Promise.race([sendPromise, timeoutPromise]);
+};
 
 // Esta es la función que manda el correo
 export const sendVerificationEmail = async (email: string, code: string) => {
     console.log(`[MAIL] sendVerificationEmail called for: ${email}`);
-    console.log(`[MAIL] SMTP config - Host: ${process.env.SMTP_HOST || '(not set, using smtp.ethereal.email)'}, Port: ${process.env.SMTP_PORT || '(not set, using 587)'}, User: ${process.env.SMTP_USER || '(not set)'}`);
+    console.log(
+        `[MAIL] SMTP config — Host: ${process.env.SMTP_HOST || '(not set, using smtp.ethereal.email)'}, ` +
+        `Port: ${process.env.SMTP_PORT || '(not set, using 587)'}, ` +
+        `User: ${process.env.SMTP_USER || '(not set)'}, ` +
+        `Pass set: ${process.env.SMTP_PASS ? 'YES (' + process.env.SMTP_PASS.length + ' chars)' : 'NO'}`
+    );
 
     try {
-        const info = await transporter.sendMail({
+        console.log(`[MAIL] Calling transporter.sendMail() for ${email}...`);
+
+        const info = await sendMailWithTimeout({
             from: '"Sistema de Verificación" <no-reply@miapi.com>',
             to: email,
             subject: "Código de verificación ✔",
@@ -37,6 +66,7 @@ export const sendVerificationEmail = async (email: string, code: string) => {
             `,
         });
 
+        console.log(`[MAIL] transporter.sendMail() completed for ${email}`);
         console.log("✉️ Email enviado: %s", info.messageId);
 
         // Si usamos ethereal.email, nos da una URL para ver el correo
@@ -44,7 +74,39 @@ export const sendVerificationEmail = async (email: string, code: string) => {
         if (process.env.SMTP_HOST === 'smtp.ethereal.email' || !process.env.SMTP_HOST) {
             console.log("🔗 Ver email en: %s", nodemailer.getTestMessageUrl(info));
         }
-    } catch (error) {
-        console.error("❌ Error enviando email:", error instanceof Error ? error.stack : error);
+    } catch (error: any) {
+        const errCode: string = error?.code ?? '';
+        const responseCode: number | undefined = error?.responseCode;
+
+        if (error?.message?.includes('timeout')) {
+            console.error(
+                `❌ [MAIL] TIMEOUT — sendMail no completó en ${SEND_MAIL_TIMEOUT_MS}ms. ` +
+                `Posibles causas: firewall bloqueando puerto 587, SMTP_HOST incorrecto, o el servidor no responde.`
+            );
+        } else if (errCode === 'ECONNREFUSED') {
+            console.error(
+                `❌ [MAIL] ECONNREFUSED — No se pudo conectar a ` +
+                `${process.env.SMTP_HOST}:${process.env.SMTP_PORT}. Verifica host y puerto.`
+            );
+        } else if (errCode === 'ENOTFOUND') {
+            console.error(
+                `❌ [MAIL] ENOTFOUND — No se resolvió el host "${process.env.SMTP_HOST}". ` +
+                `Verifica la variable SMTP_HOST y la conectividad DNS.`
+            );
+        } else if (responseCode === 535 || errCode === 'EAUTH') {
+            console.error(
+                `❌ [MAIL] AUTENTICACIÓN FALLIDA (535/EAUTH) — Gmail rechazó las credenciales. ` +
+                `Verifica que SMTP_USER sea la cuenta Gmail completa y SMTP_PASS sea una ` +
+                `contraseña de aplicación de 16 caracteres (sin espacios). ` +
+                `Asegúrate de que "Contraseñas de aplicación" esté habilitado en la cuenta Google.`
+            );
+        } else if (responseCode !== undefined && responseCode >= 500) {
+            console.error(
+                `❌ [MAIL] Error SMTP ${responseCode} — Respuesta del servidor: ` +
+                `${error?.response ?? '(sin respuesta)'}`
+            );
+        } else {
+            console.error("❌ [MAIL] Error enviando email:", error instanceof Error ? error.stack : error);
+        }
     }
 };
