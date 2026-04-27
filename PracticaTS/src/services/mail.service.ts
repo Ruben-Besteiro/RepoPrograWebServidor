@@ -4,7 +4,7 @@
 import nodemailer from 'nodemailer';
 
 // Timeout en ms para la llamada a sendMail — evita que se quede colgada indefinidamente
-const SEND_MAIL_TIMEOUT_MS = 10_000;
+const SEND_MAIL_TIMEOUT_MS = 30_000;
 
 // Esto es un usuario de prueba que crea Ethereal Email para mandar correos
 // Luego en el codigo real deberemos usar GMAIL, etc.
