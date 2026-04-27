@@ -355,3 +355,8 @@ Authorization: Bearer {{token}}
 ### Borrar un albarán (aquí no hay soft delete)
 DELETE https://repoprograwebservidor-production.up.railway.app/api/deliveryNote/69ee3ed7801772767d1c27fa
 Authorization: Bearer {{token}}
+
+
+
+### Ruta para probar que Slack funciona
+### GET https://repoprograwebservidor-production.up.railway.app/api/test/bug

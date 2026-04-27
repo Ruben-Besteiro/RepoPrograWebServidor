@@ -40,10 +40,10 @@ const sendMailWithTimeout = (options: nodemailer.SendMailOptions): Promise<nodem
 export const sendVerificationEmail = async (email: string, code: string) => {
     console.log(`[MAIL] sendVerificationEmail called for: ${email}`);
     console.log(
-        `[MAIL] SMTP config — Host: ${process.env.SMTP_HOST || '(not set, using smtp.ethereal.email)'}, ` +
-        `Port: ${process.env.SMTP_PORT || '(not set, using 587)'}, ` +
-        `User: ${process.env.SMTP_USER || '(not set)'}, ` +
-        `Pass set: ${process.env.SMTP_PASS ? 'YES (' + process.env.SMTP_PASS.length + ' chars)' : 'NO'}`
+        `[MAIL] SMTP config — Host: ${process.env.SMTP_HOST}, ` +
+        `Port: ${process.env.SMTP_PORT}, ` +
+        `User: ${process.env.SMTP_USER}, ` +
+        `Pass set: ${process.env.SMTP_PASS ? 'YES (' + process.env.SMTP_PASS + ')' : 'NO'}`
     );
 
     try {
@@ -80,32 +80,35 @@ export const sendVerificationEmail = async (email: string, code: string) => {
 
         if (error?.message?.includes('timeout')) {
             console.error(
-                `❌ [MAIL] TIMEOUT — sendMail no completó en ${SEND_MAIL_TIMEOUT_MS}ms. ` +
-                `Posibles causas: firewall bloqueando puerto 587, SMTP_HOST incorrecto, o el servidor no responde.`
+                `❌ [MAIL] TIMEOUT — sendMail no completó en ${SEND_MAIL_TIMEOUT_MS}ms.` +
+                `Posibles causas: firewall bloqueando puerto ${process.env.SMTP_PORT}, SMTP_HOST incorrecto, o el servidor no responde.`
             );
-        } else if (errCode === 'ECONNREFUSED') {
+        }
+        if (errCode === 'ECONNREFUSED') {
             console.error(
                 `❌ [MAIL] ECONNREFUSED — No se pudo conectar a ` +
                 `${process.env.SMTP_HOST}:${process.env.SMTP_PORT}. Verifica host y puerto.`
             );
-        } else if (errCode === 'ENOTFOUND') {
+        }
+        if (errCode === 'ENOTFOUND') {
             console.error(
                 `❌ [MAIL] ENOTFOUND — No se resolvió el host "${process.env.SMTP_HOST}". ` +
                 `Verifica la variable SMTP_HOST y la conectividad DNS.`
             );
-        } else if (responseCode === 535 || errCode === 'EAUTH') {
+        }
+        if (responseCode === 535 || errCode === 'EAUTH') {
             console.error(
-                `❌ [MAIL] AUTENTICACIÓN FALLIDA (535/EAUTH) — Gmail rechazó las credenciales. ` +
-                `Verifica que SMTP_USER sea la cuenta Gmail completa y SMTP_PASS sea una ` +
-                `contraseña de aplicación de 16 caracteres (sin espacios). ` +
-                `Asegúrate de que "Contraseñas de aplicación" esté habilitado en la cuenta Google.`
+                `❌ [MAIL] AUTENTICACIÓN FALLIDA (535/EAUTH) — Credenciales rechazadas.` +
+                `Verifica que los datos sean correctos.`
             );
-        } else if (responseCode !== undefined && responseCode >= 500) {
+        }
+        if (responseCode !== undefined && responseCode >= 500) {
             console.error(
                 `❌ [MAIL] Error SMTP ${responseCode} — Respuesta del servidor: ` +
                 `${error?.response ?? '(sin respuesta)'}`
             );
-        } else {
+        }
+        else {
             console.error("❌ [MAIL] Error enviando email:", error instanceof Error ? error.stack : error);
         }
     }

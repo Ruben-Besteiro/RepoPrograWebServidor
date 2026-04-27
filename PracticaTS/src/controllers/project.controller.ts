@@ -13,11 +13,15 @@ export const createProject = async (req: Request, res: Response) => {
         throw new AppError('ERROR_CLIENT_IS_ARCHIVED', 400);
     }
 
-    const project = new Project({ ...req.body, user: req.user!._id, company: req.user!.company });
-    project.active = true;
-    project.deleted = false;
-    project.createdAt = new Date();
-    project.updatedAt = new Date();
+    const project = new Project({
+        ...req.body,
+        user: req.user!._id,
+        company: req.user!.company,
+        active: true,
+        deleted: false,
+        createdAt: new Date(),
+        updatedAt: new Date()
+    });
     await project.save();
     res.status(201).json(project);
 };

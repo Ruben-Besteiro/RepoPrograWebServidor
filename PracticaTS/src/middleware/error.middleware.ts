@@ -1,10 +1,16 @@
 // src/middleware/error.middleware.js
 import { Request, Response, NextFunction } from 'express';
 import { AppError } from '../utils/AppError.js';
+import { sendSlackMessage } from '../services/slack.service.js';
 
 export const errorHandler = (err: any, req: Request, res: Response, next: NextFunction) => {
     err.statusCode = err.statusCode || 500;
     err.status = err.status || 'error';
+
+    // Si es un error de servidor (5XX), notificamos a Slack
+    if (err.statusCode >= 500) {
+        sendSlackMessage(err);
+    }
 
     if (process.env.NODE_ENV === 'development') {
         res.status(err.statusCode).json({
