@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import { createDeliveryNote, signDeliveryNote, deleteDeliveryNote, getAllDeliveryNotes, getDeliveryNoteById } from '../controllers/deliveryNote.controller.js';
 import { authMiddleware } from '../middleware/auth.middleware.js';
+import { uploadMiddleware } from '../middleware/upload.middleware.js';
 
 const router = Router();
 router.use(authMiddleware());
@@ -78,6 +79,17 @@ router.get('/', getAllDeliveryNotes);
  *     responses:
  *       200:
  *         description: Albarán firmado
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         multipart/form-data:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               signature:
+ *                 type: string
+ *                 format: binary
+ *                 description: Imagen de la firma
  *   delete:
  *     summary: Eliminar un albarán
  *     tags: [DeliveryNotes]
@@ -94,7 +106,7 @@ router.get('/', getAllDeliveryNotes);
  *         description: Albarán eliminado
  */
 router.get('/:id', getDeliveryNoteById);
-router.patch('/:id', signDeliveryNote);
+router.patch('/:id', uploadMiddleware.single('signature'), signDeliveryNote);
 router.delete('/:id', deleteDeliveryNote);
 
 export default router;

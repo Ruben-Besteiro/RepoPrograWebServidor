@@ -1,4 +1,4 @@
-@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2OWVmN2ZhMDU1NzdmMjAwZDY0ZjExNjkiLCJzZXNzaW9uSWQiOiI2OWVmN2ZhMDU1NzdmMjAwZDY0ZjExNmIiLCJpYXQiOjE3NzczMDM0NTYsImV4cCI6MTc3NzM4OTg1Nn0.fO9kFAjF82mEr3VEZwAln1Q2pMX-Twr_3yQhByGtt_Q
+@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2OWVmOWM3ZTVkN2UwMDk2ZjY2N2JiMjQiLCJzZXNzaW9uSWQiOiI2OWYwNzU1NDVkN2UwMDk2ZjY2N2JiMmQiLCJpYXQiOjE3NzczNjYzNTYsImV4cCI6MTc3NzQ1Mjc1Nn0.Y0SjtvQM-68sLqTaNPlhBZNrIbZTI9q109PvGBTXWlc
 @refreshToken = 5f7db270eeb999aabe022fa3d1c0b6f84556684c05a910c0f8fcc73316e296a36406b27d001d2a48180c2084aef11f7fff1059629137401ca8aa054f25b13bd5
 // El token debe ir arriba
 
@@ -31,7 +31,7 @@ Authorization: Bearer {{token}}
 Content-Type: application/json
 
 {
-    "verificationCode": 758585
+    "verificationCode": 313723
 }
 
 ### Login
@@ -40,8 +40,8 @@ POST https://repoprograwebservidor-production.up.railway.app/api/user/login
 Content-Type: application/json
 
 {
-    "email": "admin@acme.com",
-    "password": "password123"
+    "email": "pacman@namco.com",
+    "password": "xdxdxdxd"
 }
 
 ### Actualizar el usuario que tiene el token
@@ -335,25 +335,37 @@ Authorization: Bearer {{token}}
 Content-Type: application/json
 
 {
-    "client": "69edf0d72b5a55f20eed61a9",
-    "project": "69ee2438ae9477fa1b3e3444",
-    "format": "material"
+    "client": "69ef81274f98f406c641b41d",
+    "project": "69ef81274f98f406c641b421",
+    "format": "material",
+    "description": "Materia",
+    "quantity": "2",
+    "signature": null
 }
 
-### Firmar (actualizar) un albarán
-PATCH https://repoprograwebservidor-production.up.railway.app/api/deliveryNote/69ee3ed7801772767d1c27fa
+### Firmar (actualizar) un albarán y también subir una foto del albarán firmado
+PATCH https://repoprograwebservidor-production.up.railway.app/api/deliveryNote/69f07a50804418f096e0315b
 Authorization: Bearer {{token}}
+Content-Type: multipart/form-data; boundary=----WebKitFormBoundary
 
-### Obtener todos los albaranes
-GET https://repoprograwebservidor-production.up.railway.app/api/deliveryNote?signed=false
+------WebKitFormBoundary
+Content-Disposition: form-data; name="signature"; filename="signed_image.png"
+Content-Type: image/png
+
+< ./signed_image.png
+------WebKitFormBoundary--
+
+
+### Obtener todos los albaranes (con filtros)
+GET http://localhost:3000/api/deliveryNote?company=69f07a0f804418f096e03153
 Authorization: Bearer {{token}}
 
 ### Obtener un albarán por ID
-GET https://repoprograwebservidor-production.up.railway.app/api/deliveryNote/69ee3ed7801772767d1c27fa
+GET https://repoprograwebservidor-production.up.railway.app/api/deliveryNote/69ef81284f98f406c641b425
 Authorization: Bearer {{token}}
 
 ### Borrar un albarán (aquí no hay soft delete)
-DELETE https://repoprograwebservidor-production.up.railway.app/api/deliveryNote/69ee3ed7801772767d1c27fa
+DELETE https://repoprograwebservidor-production.up.railway.app/api/deliveryNote/69ef81284f98f406c641b425
 Authorization: Bearer {{token}}
 
 

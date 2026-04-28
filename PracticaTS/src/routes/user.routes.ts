@@ -232,9 +232,9 @@ router.put('/verify', authMiddleware(false), verifyUser);
  *           schema:
  *             type: object
  *             properties:
- *               company:
+ *               cif:
  *                 type: string
- *                 description: ID de la compañía (Dejar vacío para crear una nueva)
+ *                 description: CIF de la compañía (Dejar vacío para crear una nueva)
  *     responses:
  *       200:
  *         description: Usuario asociado exitosamente

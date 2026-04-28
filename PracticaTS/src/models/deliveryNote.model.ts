@@ -41,7 +41,7 @@ const deliveryNoteSchema = new mongoose.Schema(
         }],
         signed: Boolean,
         signedAt: Date,
-        signatureUrl: String,
+        signatureUrl: String,       // URL de la imagen
         pdfUrl: String,
         deleted: Boolean,
     },

@@ -79,22 +79,26 @@ export const verifyUser = async (req: Request, res: Response) => {
 
     }
 
-    // Esto se ejecuta a partir del 4º intento
-    if (user.verificationAttempts <= 0) {
-        // Borrar el usuario
-        await User.findByIdAndDelete(user._id);
-
-        // Emitir evento de borrado (por intentos fallidos)
-        eventService.emit('user:deleted', { _id: user._id, email: user.email, fullName: user.fullName, reason: 'MAX_VERIFICATION_ATTEMPTS' });
-
-        throw AppError.badRequest('MAX_VERIFICATION_ATTEMPTS');
-    }
-
     // El código se guarda como string en la BD (aunque sea un número)
     if (user.verificationCode !== String(verificationCode)) {
         user.verificationAttempts--;
-        await user.save();
+        
+        if (user.verificationAttempts <= 0) {
+            // Borrar el usuario inmediatamente si se queda sin intentos
+            await User.findByIdAndDelete(user._id);
+            
+            // Emitir evento de borrado
+            eventService.emit('user:deleted', { 
+                _id: user._id, 
+                email: user.email, 
+                fullName: user.fullName, 
+                reason: 'MAX_VERIFICATION_ATTEMPTS' 
+            });
 
+            throw AppError.badRequest('MAX_VERIFICATION_ATTEMPTS');
+        }
+
+        await user.save();
         throw AppError.unauthorized('INVALID_VERIFICATION_CODE');
     }
 
@@ -428,13 +432,13 @@ export const restoreUser = async (req: Request, res: Response) => {
 
 export const onboardUser = async (req: Request, res: Response) => {
     try {
-        const { company: companyId } = req.body;
+        const { cif } = req.body;
         const user = req.user;
         if (!user) throw AppError.unauthorized('USER_NOT_FOUND');
 
         let companyExists = null;
-        if (companyId) {
-            companyExists = await Company.findById(companyId);
+        if (cif) {
+            companyExists = await Company.findOne({ cif });
         }
 
         // Si la compañía existe, metemos al usuario en ella en calidad de guest
