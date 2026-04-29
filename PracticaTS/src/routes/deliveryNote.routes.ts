@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { createDeliveryNote, signDeliveryNote, getAllDeliveryNotes, getDeliveryNoteById, downloadDeliveryNotePDF } from '../controllers/deliveryNote.controller.js';
+import { createDeliveryNote, signDeliveryNote, getAllDeliveryNotes, getDeliveryNoteById, downloadDeliveryNotePDF, getDeliveryNotePDFUrl } from '../controllers/deliveryNote.controller.js';
 import { authMiddleware } from '../middleware/auth.middleware.js';
 import { uploadMiddleware } from '../middleware/upload.middleware.js';
 
@@ -156,6 +156,26 @@ router.get('/:id', getDeliveryNoteById);
  *                 description: Imagen de la firma
  */
 router.patch('/:id', uploadMiddleware.single('signature'), signDeliveryNote);
+
+/**
+ * @swagger
+ * /api/deliveryNote/pdf/{id}/url:
+ *   get:
+ *     summary: Generar y obtener la URL pública del PDF guardado en el servidor
+ *     tags: [DeliveryNotes]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: URL del PDF guardado
+ */
+router.get('/pdf/:id/url', getDeliveryNotePDFUrl);
 
 /**
  * @swagger
