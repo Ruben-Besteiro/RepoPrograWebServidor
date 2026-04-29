@@ -57,7 +57,7 @@ describe('Project Controller', () => {
             (Client.findById as any).mockResolvedValue({ _id: 'client123', deleted: false });
 
             const saveMock = (jest.fn() as any).mockResolvedValue(true);
-            // @ts-ignore
+            // @ts-expect-error mock static Project model implementation
             Project.mockImplementation(() => ({
                 ...req.body,
                 save: saveMock

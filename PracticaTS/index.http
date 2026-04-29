@@ -357,31 +357,18 @@ Content-Type: image/png
 
 
 ### Obtener todos los albaranes (con filtros)
-GET http://localhost:3000/api/deliveryNote?company=69f07a0f804418f096e03153
+GET http://repoprograwebservidor-production.up.railway.app/api/deliveryNote/69ef81284f98f406c641b425
 Authorization: Bearer {{token}}
 
 ### Obtener un albarán por ID
-GET https://repoprograwebservidor-production.up.railway.app/api/deliveryNote/69ef81284f98f406c641b425
+GET http://repoprograwebservidor-production.up.railway.app/api/deliveryNote/69ef81284f98f406c641b425
 Authorization: Bearer {{token}}
 
 ### Borrar un albarán (aquí no hay soft delete)
-DELETE https://repoprograwebservidor-production.up.railway.app/api/deliveryNote/69ef81284f98f406c641b425
+DELETE http://repoprograwebservidor-production.up.railway.app/api/deliveryNote/69ef81284f98f406c641b425
 Authorization: Bearer {{token}}
 
-### Descargar un albarán en PDF
-GET https://repoprograwebservidor-production.up.railway.app/api/deliveryNote/pdf/69ef81284f98f406c641b425
+### Descargar un albarán en PDF excepto si ya existe (lo guarda en /storage)
+GET http://repoprograwebservidor-production.up.railway.app/api/deliveryNote/pdf/69ef81284f98f406c641b425
 Authorization: Bearer {{token}}
 Accept: application/pdf
-
-# Nota: la respuesta es binaria PDF. En VS Code REST Client usa "Save Response Body" en la respuesta para guardarlo como `.pdf`.
-# Ejemplo con curl:
-# curl -L -o delivery_note_69ef81284f98f406c641b425.pdf "https://repoprograwebservidor-production.up.railway.app/api/deliveryNote/pdf/69ef81284f98f406c641b425" -H "Authorization: Bearer {{token}} (hay que meter el token verdadero)"
-
-
-### Obtener la URL pública del PDF guardado en el servidor
-GET https://repoprograwebservidor-production.up.railway.app/api/deliveryNote/pdf/69ef81284f98f406c641b425/url
-Authorization: Bearer {{token}}
-
-# Esta petición guarda el PDF en el servidor y devuelve un JSON con la URL pública para abrirlo en el navegador.
-### Ruta para probar que Slack funciona
-### GET https://repoprograwebservidor-production.up.railway.app/api/test/bug

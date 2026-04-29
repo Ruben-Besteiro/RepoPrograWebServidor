@@ -50,7 +50,7 @@ describe('Client Controller', () => {
             req.body = { name: 'Cliente Test', email: 'test@client.com' };
             const saveMock = (jest.fn() as any).mockResolvedValue(true);
 
-            // @ts-ignore
+            // @ts-expect-error mock static Client model implementation
             Client.mockImplementation(() => ({
                 ...req.body,
                 save: saveMock,

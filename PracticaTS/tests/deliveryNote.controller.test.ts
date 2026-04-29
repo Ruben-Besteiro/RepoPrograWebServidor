@@ -68,7 +68,7 @@ describe('DeliveryNote Controller', () => {
             (Client.findById as any).mockResolvedValue({ _id: 'c1', deleted: false });
 
             const saveMock = (jest.fn() as any).mockResolvedValue(true);
-            // @ts-ignore
+            // @ts-expect-error mock static DeliveryNote model implementation
             DeliveryNote.mockImplementation(() => ({
                 ...req.body,
                 save: saveMock

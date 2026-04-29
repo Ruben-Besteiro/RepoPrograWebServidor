@@ -496,29 +496,3 @@ export const downloadDeliveryNotePDF = async (req: Request, res: Response) => {
         throw AppError.internal('ERROR_DOWNLOAD_DELIVERY_NOTE');
     }
 };
-
-export const getDeliveryNotePDFUrl = async (req: Request, res: Response) => {
-    try {
-        const deliveryNote = await DeliveryNote.findById(req.params.id)
-            .populate('company')
-            .populate('project')
-            .populate('client')
-            .populate('user');
-
-        if (!deliveryNote) {
-            throw new AppError('ERROR_DELIVERY_NOTE_NOT_FOUND', 404);
-        }
-
-        const { filename } = await saveDeliveryNotePDFFile(deliveryNote);
-        const host = req.get('host') || `localhost:${process.env.PORT || 3000}`;
-        const protocolHeader = req.get('x-forwarded-proto');
-        const protocol = protocolHeader ? protocolHeader.split(',')[0].trim() : req.protocol;
-        const fileUrl = `${protocol}://${host}/uploads/${filename}`;
-
-        res.status(200).json({ data: { url: fileUrl } });
-    } catch (err) {
-        console.error('Error generating PDF URL:', err);
-        if (err instanceof AppError) throw err;
-        throw AppError.internal('ERROR_DOWNLOAD_DELIVERY_NOTE');
-    }
-};

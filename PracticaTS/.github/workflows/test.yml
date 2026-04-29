@@ -1,0 +1,52 @@
+# .github/workflows/test.yml
+# Esto se ejecuta automáticamente cuando hacemos push a main o develop, o cuando hacemos un pull request a main
+# Nosotros no lo llamamos maualmente, GitHub lo hace por nosotros
+# Si esto falla, el commit también. Pero el push no se detiene, lo que falla es el merge a main
+# Para que el push se detenga hay que implementar "branch protection"
+
+name: Tests
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    services:
+      mongodb:
+        image: mongo:latest
+        ports:
+          - 27017:27017
+
+    steps:
+      # Primero mira el código del repo
+      - name: Checkout código
+        uses: actions/checkout@v4
+
+      # Después instala Node.js si no está
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+
+      # Luego instala las dependencias (npm ci lo que hace es instalar exactamente lo que hay en package-lock.json)
+      - name: Instalar dependencias
+        run: npm ci
+
+      # Linter sirve para revisar que el código sigue las reglas de estilo y no tiene errores comunes
+      - name: Ejecutar linter
+        run: npm run lint
+
+      # Y por último ejecuta los tests
+      - name: Ejecutar tests
+        run: npm test
+        env:
+          NODE_ENV: test
+          # Es necesario que esto se duplique aquí
+          JWT_SECRET: ${{ secrets.JWT_SECRET }}     # Esto se debe añadir manualmente a GitHub, en Settings -> Secrets and variables -> Actions -> New repository secret
+          MONGO_URL: ${{ secrets.MONGO_URL }}         # Esto se debe añadir manualmente a GitHub, en Settings -> Secrets and variables -> Actions -> New repository secret
