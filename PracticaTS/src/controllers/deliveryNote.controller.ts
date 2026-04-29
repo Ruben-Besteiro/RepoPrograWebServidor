@@ -3,6 +3,10 @@ import { AppError } from '../utils/AppError.js';
 import { DeliveryNote } from '../models/deliveryNote.model.js';
 import { Project } from '../models/project.model.js';
 import { Client } from '../models/client.model.js';
+import PDFDocument from 'pdfkit';
+import path from 'path';
+import fs from 'fs';
+
 
 export const createDeliveryNote = async (req: Request, res: Response) => {
     try {
@@ -186,5 +190,175 @@ export const deleteDeliveryNote = async (req: Request, res: Response) => {
     } catch (err) {
         if (err instanceof AppError) throw err;
         throw AppError.internal('ERROR_DELETE_DELIVERY_NOTE');
+    }
+};
+
+export const downloadDeliveryNotePDF = async (req: Request, res: Response) => {
+    try {
+        const deliveryNote = await DeliveryNote.findById(req.params.id)
+            .populate('company')
+            .populate('project')
+            .populate('client')
+            .populate('user');
+
+        if (!deliveryNote) {
+            throw new AppError('ERROR_DELIVERY_NOTE_NOT_FOUND', 404);
+        }
+
+        const doc = new PDFDocument({ margin: 50 });
+
+        // Ensure storage directory exists
+        const storageDir = path.join(process.cwd(), 'storage');
+        if (!fs.existsSync(storageDir)) {
+            fs.mkdirSync(storageDir, { recursive: true });
+        }
+
+        const filename = `delivery_note_${deliveryNote._id}.pdf`;
+        const outputPath = path.join(storageDir, filename);
+
+        // Pipe the PDF to a file in storage
+        const fileStream = fs.createWriteStream(outputPath);
+        doc.pipe(fileStream);
+
+        // --- Header Section ---
+        const company: any = deliveryNote.company;
+        if (company && company.logo) {
+            // Try to find the logo in storage if it's an internal URL
+            const logoFilename = company.logo.split('/').pop();
+            const logoPath = path.join(process.cwd(), 'storage', logoFilename);
+            if (fs.existsSync(logoPath)) {
+                doc.image(logoPath, 50, 45, { width: 50 });
+            }
+        }
+
+        doc.fontSize(20).text('ALBARÁN DE TRABAJO', { align: 'right' });
+        doc.fontSize(10).text(`ID: ${deliveryNote._id}`, { align: 'right' });
+        doc.moveDown(2);
+
+        // --- Grid Layout for Company and Client ---
+        const startY = doc.y;
+        
+        // Left Column: Company
+        doc.fontSize(12).text('DE:', 50, startY, { underline: true });
+        doc.moveDown(0.5);
+        if (company) {
+            doc.fontSize(11).text(company.name || 'Empresa no especificada');
+            if (company.cif) doc.text(`CIF: ${company.cif}`);
+            if (company.address) {
+                const addr = company.address;
+                doc.text(`${addr.street || ''} ${addr.number || ''}`);
+                doc.text(`${addr.postal || ''} ${addr.city || ''}`);
+                doc.text(`${addr.province || ''}`);
+            }
+        } else {
+            doc.text('Información de empresa no disponible');
+        }
+
+        // Right Column: Client
+        const client: any = deliveryNote.client;
+        doc.fontSize(12).text('PARA:', 300, startY, { underline: true });
+        doc.moveDown(0.5);
+        if (client) {
+            doc.fontSize(11).text(client.name || 'Cliente no especificado', 300);
+            if (client.cif) doc.text(`CIF: ${client.cif}`, 300);
+            if (client.address) {
+                const addr = client.address;
+                doc.text(`${addr.street || ''} ${addr.number || ''}`, 300);
+                doc.text(`${addr.postal || ''} ${addr.city || ''}`, 300);
+                doc.text(`${addr.province || ''}`, 300);
+            }
+        } else {
+            doc.text('Información de cliente no disponible', 300);
+        }
+
+        doc.moveDown(2);
+
+        // --- Project Section ---
+        const project: any = deliveryNote.project;
+        doc.fontSize(12).text('PROYECTO:', 50, doc.y, { underline: true });
+        doc.moveDown(0.5);
+        doc.fontSize(11).text(project?.name || 'N/A');
+        if (project?.projectCode) doc.text(`Código: ${project.projectCode}`);
+        doc.text(`Fecha de trabajo: ${deliveryNote.workDate ? new Date(deliveryNote.workDate).toLocaleDateString() : 'N/A'}`);
+        doc.moveDown();
+
+        // --- Table Header ---
+        doc.rect(50, doc.y, 500, 20).fill('#f0f0f0').stroke('#cccccc');
+        doc.fillColor('black').fontSize(11).text('Descripción', 60, doc.y + 5);
+        doc.text(deliveryNote.format === 'material' ? 'Cantidad' : 'Horas', 450, doc.y, { width: 90, align: 'right' });
+        doc.moveDown(1.5);
+
+        // --- Content ---
+        const contentY = doc.y;
+        doc.fontSize(10).text(deliveryNote.description || 'Sin descripción', 60, contentY, { width: 380 });
+        
+        if (deliveryNote.format === 'material') {
+            doc.text(`${deliveryNote.quantity || 0} ${deliveryNote.unit || ''}`, 450, contentY, { width: 90, align: 'right' });
+            if (deliveryNote.material) {
+                doc.moveDown();
+                doc.fontSize(9).text(`Material: ${deliveryNote.material}`, 60);
+            }
+        } else {
+            doc.text(`${deliveryNote.hours || 0} h`, 450, contentY, { width: 90, align: 'right' });
+            if (deliveryNote.workers && deliveryNote.workers.length > 0) {
+                doc.moveDown();
+                doc.fontSize(9).text('Trabajadores:', 60);
+                deliveryNote.workers.forEach(w => {
+                    doc.text(`- ${w.name}: ${w.hours}h`, 70);
+                });
+            }
+        }
+
+        doc.moveDown(3);
+
+        // --- Signature Section ---
+        if (deliveryNote.signed) {
+            doc.fontSize(12).text('FIRMA DEL CLIENTE:', 50, doc.y, { underline: true });
+            doc.fontSize(9).text(`Firmado el: ${deliveryNote.signedAt ? new Date(deliveryNote.signedAt).toLocaleString() : 'N/A'}`);
+            doc.moveDown(0.5);
+
+            if (deliveryNote.signatureUrl) {
+                const signatureFilename = deliveryNote.signatureUrl.split('/').pop();
+                const signaturePath = path.join(process.cwd(), 'storage', signatureFilename || '');
+                
+                if (fs.existsSync(signaturePath)) {
+                    doc.image(signaturePath, { width: 150 });
+                } else {
+                    doc.text('Firma disponible en: ' + deliveryNote.signatureUrl);
+                }
+            }
+        } else {
+            doc.fillColor('red').fontSize(12).text('PENDIENTE DE FIRMA', { align: 'center' });
+            doc.fillColor('black');
+        }
+
+        // --- Footer ---
+        const footerY = doc.page.height - 70;
+        doc.fontSize(8)
+            .fillColor('#888888')
+            .text('Este documento es un comprobante de los trabajos realizados.', 50, footerY, { align: 'center', width: 500 })
+            .text(`Documento generado por el sistema el ${new Date().toLocaleString()}`, { align: 'center', width: 500 });
+
+        // Finalize the PDF and wait until the file is completely written
+        doc.end();
+        await new Promise<void>((resolve, reject) => {
+            fileStream.on('finish', resolve);
+            fileStream.on('error', reject);
+        });
+
+        // Send the saved PDF file as attachment
+        res.download(outputPath, filename, (downloadErr) => {
+            if (downloadErr) {
+                console.error('Error sending PDF download:', downloadErr);
+                if (!res.headersSent) {
+                    res.status(500).send('ERROR_DOWNLOAD_DELIVERY_NOTE');
+                }
+            }
+        });
+
+    } catch (err) {
+        console.error('Error generating PDF:', err);
+        if (err instanceof AppError) throw err;
+        throw AppError.internal('ERROR_DOWNLOAD_DELIVERY_NOTE');
     }
 };

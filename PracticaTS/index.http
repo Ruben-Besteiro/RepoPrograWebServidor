@@ -1,4 +1,4 @@
-@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2OWVmOWM3ZTVkN2UwMDk2ZjY2N2JiMjQiLCJzZXNzaW9uSWQiOiI2OWYwNzU1NDVkN2UwMDk2ZjY2N2JiMmQiLCJpYXQiOjE3NzczNjYzNTYsImV4cCI6MTc3NzQ1Mjc1Nn0.Y0SjtvQM-68sLqTaNPlhBZNrIbZTI9q109PvGBTXWlc
+@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2OWVmOWM3ZTVkN2UwMDk2ZjY2N2JiMjQiLCJzZXNzaW9uSWQiOiI2OWYxYzc4MjAxNDYyYjI4YmIwNzA5ZTgiLCJpYXQiOjE3Nzc0NTI5MzAsImV4cCI6MTc3NzUzOTMzMH0.hRHnl9crnnQzuKPB1w5F35bOUb56_PiadniFDYVELCU
 @refreshToken = 5f7db270eeb999aabe022fa3d1c0b6f84556684c05a910c0f8fcc73316e296a36406b27d001d2a48180c2084aef11f7fff1059629137401ca8aa054f25b13bd5
 // El token debe ir arriba
 
@@ -10,10 +10,10 @@ POST https://repoprograwebservidor-production.up.railway.app/api/user/register
 Content-Type: application/json
 
 {
-    "email": "pacman@namco.com",
-    "password": "xdxdxdxd",
-    "name": "Pac",
-    "lastName": "Man",
+    "email": "eeeeeee@gmail.com",
+    "password": "ññññññññ",
+    "name": "ññ",
+    "lastName": "ññ",
     "nif": "12345678X",
     "role": "guest",
     "address": {
@@ -368,6 +368,10 @@ Authorization: Bearer {{token}}
 DELETE https://repoprograwebservidor-production.up.railway.app/api/deliveryNote/69ef81284f98f406c641b425
 Authorization: Bearer {{token}}
 
+### Descargar un albarán en PDF
+GET https://repoprograwebservidor-production.up.railway.app/api/deliveryNote/pdf/69ef81284f98f406c641b425
+Authorization: Bearer {{token}}
+Accept: application/pdf
 
 
 ### Ruta para probar que Slack funciona
