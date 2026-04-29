@@ -10,10 +10,10 @@ POST https://repoprograwebservidor-production.up.railway.app/api/user/register
 Content-Type: application/json
 
 {
-    "email": "pacman@namco.com",
-    "password": "xdxdxdxd",
-    "name": "Pac",
-    "lastName": "Man",
+    "email": "eeeeeee@gmail.com",
+    "password": "ññññññññ",
+    "name": "ññ",
+    "lastName": "ññ",
     "nif": "12345678X",
     "role": "guest",
     "address": {
@@ -368,6 +368,10 @@ Authorization: Bearer {{token}}
 DELETE https://repoprograwebservidor-production.up.railway.app/api/deliveryNote/69ef81284f98f406c641b425
 Authorization: Bearer {{token}}
 
+### Descargar un albarán en PDF
+GET https://repoprograwebservidor-production.up.railway.app/api/deliveryNote/pdf/69ef81284f98f406c641b425
+Authorization: Bearer {{token}}
+Accept: application/pdf
 
 
 ### Ruta para probar que Slack funciona

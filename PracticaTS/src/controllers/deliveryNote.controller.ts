@@ -188,3 +188,16 @@ export const deleteDeliveryNote = async (req: Request, res: Response) => {
         throw AppError.internal('ERROR_DELETE_DELIVERY_NOTE');
     }
 };
+
+export const downloadDeliveryNotePDF = async (req: Request, res: Response) => {
+    try {
+        const deliveryNote = await DeliveryNote.findById(req.params.id);
+        if (!deliveryNote) {
+            throw new AppError('ERROR_DELIVERY_NOTE_NOT_FOUND', 404);
+        }
+        res.status(200).json({ data: deliveryNote });
+    } catch (err) {
+        if (err instanceof AppError) throw err;
+        throw AppError.internal('ERROR_DOWNLOAD_DELIVERY_NOTE');
+    }
+};
