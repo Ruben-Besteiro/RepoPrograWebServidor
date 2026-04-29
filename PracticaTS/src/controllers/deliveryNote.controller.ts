@@ -284,7 +284,7 @@ const saveDeliveryNotePDFFile = async (deliveryNote: any) => {
             if (deliveryNote.workers && deliveryNote.workers.length > 0) {
                 doc.moveDown();
                 doc.fontSize(9).text('Trabajadores:', 60);
-                deliveryNote.workers.forEach(w => {
+                deliveryNote.workers.forEach((w: any) => {
                     doc.text(`- ${w.name}: ${w.hours}h`, 70);
                 });
             }
