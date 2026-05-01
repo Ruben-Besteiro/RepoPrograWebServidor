@@ -1,24 +1,38 @@
 # Dockerfile
-# Railway detecta el archivo y crea el contenedor automáticamente
-# Si no existe, el contenedor se crea con un Dockerfile default
+# Multi-stage build: compilar TS en build stage, ejecutar JS en producción
 
-# Imagen base
-FROM node:22-alpine
+# ---- Stage 1: Build ----
+FROM node:22-alpine AS builder
 
-# Directorio de trabajo
 WORKDIR /app
 
-# Copiar archivos de dependencias
+# Instalar TODAS las dependencias (incluye devDeps con tsc/tsx)
 COPY package*.json ./
+RUN npm ci
 
-# Instalar dependencias (solo producción)
+# Copiar fuentes y compilar
+COPY tsconfig.json ./
+COPY tsconfig.build.json ./
+COPY src ./src
+RUN npx tsc --project tsconfig.build.json
+
+# ---- Stage 2: Production ----
+FROM node:22-alpine
+
+WORKDIR /app
+
+# Solo dependencias de producción
+COPY package*.json ./
 RUN npm ci --only=production
 
-# Copiar código fuente
-COPY . .
+# Copiar JS compilado desde el stage anterior
+COPY --from=builder /app/dist ./dist
 
-# Puerto que expone la app
+# Puerto que expone la app (Railway lo sobreescribe con $PORT)
 EXPOSE 3000
 
 # Usuario no-root por seguridad
 USER node
+
+# Comando de arranque
+CMD ["node", "dist/app.js"]

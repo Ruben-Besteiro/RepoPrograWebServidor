@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
 import { Company } from '../models/company.model.js';
 import { AppError } from '../utils/AppError.js';
+import { uploadToCloudinary } from '../utils/cloudinary.js';
 
 export const createCompany = async (req: Request, res: Response) => {
     try {
@@ -63,9 +64,9 @@ export const editLogo = async (req: Request, res: Response) => {
             throw AppError.forbidden('USER_HAS_NO_COMPANY');
         }
 
-        // Construir la URL completa del archivo base
-        const PUBLIC_URL = process.env.PUBLIC_URL || `http://localhost:${process.env.PORT || 3000}`;
-        const logoUrl = `${PUBLIC_URL}/uploads/${file.filename}`;
+        // Subir el buffer a Cloudinary
+        const publicId = `logo-${user.company._id}-${Date.now()}`;
+        const { secure_url: logoUrl } = await uploadToCloudinary(file.buffer, 'logos', publicId);
 
         // Mongoose no guarda de forma automática campos de subdocumentos poblados
         // Hay que actualizar explícitamente el documento de Company

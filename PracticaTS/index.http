@@ -1,4 +1,4 @@
-@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2OWVmOWM3ZTVkN2UwMDk2ZjY2N2JiMjQiLCJzZXNzaW9uSWQiOiI2OWYxYzc4MjAxNDYyYjI4YmIwNzA5ZTgiLCJpYXQiOjE3Nzc0NTI5MzAsImV4cCI6MTc3NzUzOTMzMH0.hRHnl9crnnQzuKPB1w5F35bOUb56_PiadniFDYVELCU
+@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2OWVmOWM3ZTVkN2UwMDk2ZjY2N2JiMjQiLCJzZXNzaW9uSWQiOiI2OWY0ODM4YWYwNTFjN2FmYWIxODVlYjUiLCJpYXQiOjE3Nzc2MzIxMzgsImV4cCI6MTc3NzcxODUzOH0.Di6I0qeS11HzH7YliCHe05IXN7-LXDM3Qb8j7ffsb8c
 @refreshToken = 5f7db270eeb999aabe022fa3d1c0b6f84556684c05a910c0f8fcc73316e296a36406b27d001d2a48180c2084aef11f7fff1059629137401ca8aa054f25b13bd5
 // El token debe ir arriba
 
@@ -177,16 +177,16 @@ Content-Type: application/json
 }
 
 ### Subir el logo de la compañía con Multer
-### Esto lo que hace es coger el archivo de Content-Disposition y guardarlo en storage
+### Esto lo que hace es coger el archivo de Content-Disposition y guardarlo en Cloudinary
 PATCH https://repoprograwebservidor-production.up.railway.app/api/company/logo
 Authorization: Bearer {{token}}
 Content-Type: multipart/form-data; boundary=----WebKitFormBoundary
 
 ------WebKitFormBoundary
-Content-Disposition: form-data; name="logo"; filename="test_logo.png"
+Content-Disposition: form-data; name="logo"; filename="signed_image.png"
 Content-Type: image/png
 
-< ./test_logo.png
+< ./signed_image.png
 ------WebKitFormBoundary--
 
 ### Obtener compañías (ruta protegida)

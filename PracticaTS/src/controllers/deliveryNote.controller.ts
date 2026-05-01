@@ -3,6 +3,7 @@ import { AppError } from '../utils/AppError.js';
 import { DeliveryNote } from '../models/deliveryNote.model.js';
 import { Project } from '../models/project.model.js';
 import { Client } from '../models/client.model.js';
+import { uploadToCloudinary } from '../utils/cloudinary.js';
 import PDFDocument from 'pdfkit';
 import path from 'path';
 import fs from 'fs';
@@ -66,8 +67,13 @@ export const signDeliveryNote = async (req: Request, res: Response) => {
             throw new AppError('ERROR_SIGNATURE_REQUIRED', 400);
         }
 
-        const PUBLIC_URL = process.env.PUBLIC_URL || `http://localhost:${process.env.PORT || 3000}`;
-        const signatureUrl = `${PUBLIC_URL}/uploads/${file.filename}`;
+        // Subir la firma a Cloudinary
+        const publicId = `signature-${req.params.id}-${Date.now()}`;
+        const { secure_url: signatureUrl } = await uploadToCloudinary(
+            file.buffer,
+            'signatures',
+            publicId
+        );
 
         const deliveryNote = await DeliveryNote.findByIdAndUpdate(
             req.params.id,
