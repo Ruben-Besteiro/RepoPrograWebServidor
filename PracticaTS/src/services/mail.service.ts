@@ -37,8 +37,10 @@ const sendMailWithTimeout = (options: nodemailer.SendMailOptions): Promise<nodem
 };
 
 // Esta es la función que manda el correo
-export const sendVerificationEmail = async (email: string, code: string) => {
-    console.log(`[MAIL] sendVerificationEmail called for: ${email}`);
+export const sendVerificationEmail = async (email: string, code: string, userName: string) => {
+    const displayName = userName || 'Usuario';
+
+    console.log(`[MAIL] sendVerificationEmail called for: ${email} (${displayName})`);
     console.log(
         `[MAIL] SMTP config — Host: ${process.env.SMTP_HOST}, ` +
         `Port: ${process.env.SMTP_PORT}, ` +
@@ -53,10 +55,11 @@ export const sendVerificationEmail = async (email: string, code: string) => {
             from: '"Sistema de Verificación" <no-reply@miapi.com>',
             to: email,
             subject: "Código de verificación ✔",
-            text: `Tu código de verificación es: ${code}`,
+            text: `Hola ${displayName},\n\nTu código de verificación es: ${code}\n\nSi no has solicitado este código, ignora este correo.`,
             html: `
                 <div style="font-family: Arial, sans-serif; max-width: 600px; margin: auto; padding: 20px; border: 1px solid #ddd; border-radius: 10px;">
                     <h2 style="color: #333;">Verificación de cuenta</h2>
+                    <p>Hola ${displayName},</p>
                     <p>Gracias por registrarte. Para completar tu registro, utiliza el siguiente código:</p>
                     <div style="font-size: 24px; font-weight: bold; background: #f4f4f4; padding: 10px; text-align: center; border-radius: 5px; margin: 20px 0;">
                         ${code}

@@ -1,14 +1,14 @@
 
 export const sendSlackMessage = async (error: any) => {
     const webhookUrl = process.env.SLACK_WEBHOOK_URL;
-    
+
     if (!webhookUrl) {
-        console.warn('⚠️ SLACK_WEBHOOK_URL no está definida. Saltando notificación.');
+        console.warn('SLACK_WEBHOOK_URL no está definida. Saltando notificación.');
         return;
     }
 
     const payload = {
-        text: `🚨 *Error 500 en la API* 🚨`,
+        text: `*Error 500 en la API*`,
         attachments: [
             {
                 color: '#ff0000',
@@ -46,11 +46,11 @@ export const sendSlackMessage = async (error: any) => {
         });
 
         if (!response.ok) {
-            console.error(`❌ Error enviando a Slack: ${response.statusText}`);
+            console.error(`Error enviando a Slack: ${response.statusText}`);
         } else {
-            console.log('✅ Notificación enviada a Slack');
+            console.log('Notificación enviada a Slack');
         }
     } catch (err) {
-        console.error('❌ Error de red enviando a Slack:', err);
+        console.error('Error de red enviando a Slack:', err);
     }
 };

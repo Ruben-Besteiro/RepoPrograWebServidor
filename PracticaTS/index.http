@@ -5,12 +5,12 @@
 ### Health Check
 GET https://repoprograwebservidor-production.up.railway.app/health
 
-### Registrar usuario (hay que verificarlo) (por defecto es admin)
+### Registrar usuario (hay que verificarlo)
 POST https://repoprograwebservidor-production.up.railway.app/api/user/register
 Content-Type: application/json
 
 {
-    "email": "eeeeeee@gmail.com",
+    "email": "qvem@gmail.com",
     "password": "ññññññññ",
     "name": "ññ",
     "lastName": "ññ",
@@ -31,7 +31,7 @@ Authorization: Bearer {{token}}
 Content-Type: application/json
 
 {
-    "verificationCode": 313723
+    "verificationCode": 981167
 }
 
 ### Login
@@ -99,7 +99,8 @@ POST https://repoprograwebservidor-production.up.railway.app/api/user/refresh
 Content-Type: application/json
 
 {
-    "refreshToken": "{{refreshToken}}"
+    // Es necesario guardar el refresh token arriba pero NO se puede commitear
+    //"refreshToken": "{{refreshToken}}"
 }
 
 ### Cerrar sesión (manda a tomar por culo ambos tokens)
@@ -108,7 +109,8 @@ Authorization: Bearer {{token}}
 Content-Type: application/json
 
 {
-    "refreshToken": "{{refreshToken}}"
+    // Ver arriba
+    //"refreshToken": "{{refreshToken}}"
 }
 
 ### Cerrar todas las sesiones (necesita accessToken)

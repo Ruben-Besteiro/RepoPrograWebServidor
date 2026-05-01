@@ -14,6 +14,7 @@ jest.unstable_mockModule('../src/models/user.model.js', () => ({
 
 jest.unstable_mockModule('../src/models/company.model.js', () => ({
     Company: {
+        findOne: jest.fn(),
         findById: jest.fn(),
         create: jest.fn()
     }
@@ -142,9 +143,9 @@ describe('User Controller', () => {
 
     describe('onboardUser', () => {
         it('debe vincular a compañía', async () => {
-            req.body = { company: 'comp1' };
+            req.body = { cif: 'comp1' };
             req.user = { _id: 'user1', save: jest.fn() };
-            (Company.findById as any).mockResolvedValue({ _id: 'comp1', isFreelance: false });
+            (Company.findOne as any).mockResolvedValue({ _id: 'comp1', isFreelance: false, owner: 'user1' });
 
             await onboardUser(req, res);
 
@@ -175,6 +176,13 @@ describe('User Controller', () => {
             await refreshTokenCtrl(req, res);
 
             expect(storedToken.revoked).toBe(true);
+        });
+
+        it('debe fallar si el refreshToken no es válido', async () => {
+            req.body = { refreshToken: 'invalidToken' };
+            (RefreshToken.findOne as any).mockReturnValue({ populate: (jest.fn() as any).mockResolvedValue(null) });
+
+            await expect(refreshTokenCtrl(req, res)).rejects.toThrow('INVALID_REFRESH_TOKEN');
         });
     });
 
@@ -280,8 +288,8 @@ describe('User Controller', () => {
     describe('onboardUser', () => {
         it('falla si es freelance de otro', async () => {
             req.user = { _id: 'u1' };
-            req.body = { company: 'c1' };
-            (Company.findById as any).mockResolvedValue({ _id: 'c1', isFreelance: true, owner: 'u2' });
+            req.body = { cif: 'c1' };
+            (Company.findOne as any).mockResolvedValue({ _id: 'c1', isFreelance: true, owner: 'u2' });
             await expect(onboardUser(req, res)).rejects.toThrow('COMPANY_IS_FREELANCE');
         });
 

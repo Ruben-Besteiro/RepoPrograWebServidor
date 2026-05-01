@@ -10,9 +10,13 @@ jest.unstable_mockModule('../src/models/company.model.js', () => ({
         findByIdAndDelete: jest.fn()
     }
 }));
+jest.unstable_mockModule('../src/utils/cloudinary.js', () => ({
+    uploadToCloudinary: jest.fn()
+}));
 
 const { createCompany, updateCompany, getCompanies, deleteCompany, editLogo } = await import('../src/controllers/company.controller.js');
 const { Company } = await import('../src/models/company.model.js');
+const { uploadToCloudinary } = await import('../src/utils/cloudinary.js');
 
 describe('Company Controller', () => {
     let req: any;
@@ -155,9 +159,10 @@ describe('Company Controller', () => {
         });
 
         it('debe subir el archivo y actualizar la compañía', async () => {
-            req.file = { filename: 'dummy.png' };
+            req.file = { filename: 'dummy.png', buffer: Buffer.from('dummy') };
             req.user = { company: { _id: 'company123' } };
             const expectedUrl = `${PUBLIC_URL}/uploads/dummy.png`;
+            (uploadToCloudinary as any).mockResolvedValue({ secure_url: expectedUrl });
             (Company.findByIdAndUpdate as any).mockResolvedValue({ logo: expectedUrl });
 
             await editLogo(req, res);
@@ -172,8 +177,9 @@ describe('Company Controller', () => {
         });
 
         it('debe fallar si hay excepción en la actualización', async () => {
-            req.file = { filename: 'dummy.png' };
+            req.file = { filename: 'dummy.png', buffer: Buffer.from('dummy') };
             req.user = { company: { _id: 'company123' } };
+            (uploadToCloudinary as any).mockResolvedValue({ secure_url: `${PUBLIC_URL}/uploads/dummy.png` });
             (Company.findByIdAndUpdate as any).mockRejectedValue(new Error('Mongoose Error'));
             try {
                 await editLogo(req, res);

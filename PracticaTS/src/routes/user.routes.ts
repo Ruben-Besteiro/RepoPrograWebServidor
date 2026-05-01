@@ -57,6 +57,7 @@ const router = Router();
  *                   type: string
  *                 refreshToken:
  *                   type: string
+ *                   description: Refresh token generado por el servidor para renovar el access token.
  *       409:
  *         description: El email ya existe
  */
@@ -88,6 +89,7 @@ router.post('/register', validate(createUserSchema), registerUser);
  *                   type: string
  *                 refreshToken:
  *                   type: string
+ *                   description: Refresh token generado por el servidor para renovar el access token.
  *       404:
  *         description: Usuario no encontrado
  *       401:
@@ -100,28 +102,21 @@ router.post('/login', validate(loginUserSchema), loginUser);
  * /api/user/refresh:
  *   post:
  *     summary: Refrescar el Access Token usando el Refresh Token
+ *     description: El refresh token se genera dinámicamente al iniciar sesión y se almacena en el servidor; no se configura como variable de entorno.
  *     tags: [Users]
  *     requestBody:
  *       required: true
  *       content:
  *         application/json:
  *           schema:
- *             type: object
- *             properties:
- *               refreshToken:
- *                 type: string
+ *             $ref: '#/components/schemas/RefreshTokenInput'
  *     responses:
  *       200:
  *         description: Tokens generados exitosamente
  *         content:
  *           application/json:
  *             schema:
- *               type: object
- *               properties:
- *                 accessToken:
- *                   type: string
- *                 refreshToken:
- *                   type: string
+ *               $ref: '#/components/schemas/TokenPairResponse'
  *       400:
  *         description: Refresh Token requerido
  *       401:
@@ -358,10 +353,7 @@ router.put('/restore', authMiddleware(), restoreUser);
  *       content:
  *         application/json:
  *           schema:
- *             type: object
- *             properties:
- *               refreshToken:
- *                 type: string
+ *             $ref: '#/components/schemas/RefreshTokenInput'
  *     responses:
  *       200:
  *         description: Sesión cerrada (Refresh token revocado)

@@ -54,12 +54,11 @@ export const editLogo = async (req: Request, res: Response) => {
             throw AppError.unauthorized('USER_NOT_FOUND');
         }
 
-        // Comprobar si multer subió un archivo
         if (!file) {
             throw AppError.badRequest('NO_IMAGE_UPLOADED');
         }
 
-        // Comprobar si el usuario tiene una compañía
+        // El usuario debe tener una compañía
         if (!user.company) {
             throw AppError.forbidden('USER_HAS_NO_COMPANY');
         }

@@ -11,6 +11,10 @@ const options = {
         },
         servers: [
             {
+                url: 'https://repoprograwebservidor-production.up.railway.app',
+                description: 'Servidor de producción (Railway)'
+            },
+            {
                 url: 'http://localhost:{port}',
                 description: 'Servidor de desarrollo local',
                 variables: {
@@ -92,6 +96,20 @@ const options = {
                         nif: { type: 'string', example: '12345678A' }
                     }
                 },
+                RefreshTokenInput: {
+                    type: 'object',
+                    required: ['refreshToken'],
+                    properties: {
+                        refreshToken: { type: 'string', example: 'a1b2c3d4e5f6g7h8i9j0' }
+                    }
+                },
+                TokenPairResponse: {
+                    type: 'object',
+                    properties: {
+                        accessToken: { type: 'string', example: 'eyJhbGciOiJIUzI1Ni...' },
+                        refreshToken: { type: 'string', example: 'a1b2c3d4e5f6g7h8i9j0' }
+                    }
+                },
                 Error: {
                     type: 'object',
                     properties: {
@@ -133,7 +151,7 @@ const options = {
             }
         }
     },
-    apis: ['./src/routes/*.ts', './src/routes/*.js']
+    apis: ['./src/routes/*.ts', './dist/routes/*.js', './src/app.ts', './dist/app.js']
 };
 
 export default swaggerJsdoc(options);

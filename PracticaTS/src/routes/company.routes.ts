@@ -1,7 +1,6 @@
 import { Router } from 'express';
 import { createCompany, updateCompany, deleteCompany, getCompanies, editLogo } from '../controllers/company.controller.js';
 import { authMiddleware } from '../middleware/auth.middleware.js';
-
 import { uploadMiddleware } from '../middleware/upload.middleware.js';
 
 const router = Router();

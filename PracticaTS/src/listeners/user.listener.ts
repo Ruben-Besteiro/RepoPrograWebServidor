@@ -12,7 +12,7 @@ eventService.on('user:registered', async (user) => {
         try {
             // Aquí llamamos al mail.service.ts
             // Con esto se cumple lo de que el usuario está verificado cuando se le envía el correo
-            await sendVerificationEmail(user.email, user.verificationCode);
+            await sendVerificationEmail(user.email, user.verificationCode, user.fullName || user.name || 'Usuario');
             console.log(`[EVENT] user:registered - sendVerificationEmail completed for ${user.email}`);
         } catch (error) {
             console.error(`[EVENT] user:registered - Error calling sendVerificationEmail for ${user.email}:`, error);
