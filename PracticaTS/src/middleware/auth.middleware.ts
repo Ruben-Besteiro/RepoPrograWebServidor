@@ -4,6 +4,10 @@ import { AppError } from '../utils/AppError.js';
 import { RefreshToken } from '../models/refreshToken.model.js';
 import { NextFunction, Request, Response } from 'express';
 
+// IMPORTANTE: La variable req no tiene campo user por defecto
+// Se añade aquí, en la línea 58 y lo sacamos a partir del bearer token
+// Como en muchos sitios necesitamos saber cosas del usuario, se lo inyectamos
+
 /**
  * Middleware de autenticación y verificación (JWT)
  * @param {boolean} requireVerification - Si es true (por defecto), comprueba que el usuario esté verificado.
