@@ -1,6 +1,8 @@
 import { Router } from 'express';
 import { createClient, updateClient, deleteClient, getAllClients, getClientById, restoreClient, getArchivedClients, archiveClient } from '../controllers/client.controller.js';
 import { authMiddleware } from '../middleware/auth.middleware.js';
+import { validate } from '../middleware/validate.middleware.js';
+import { createClientSchema, updateClientSchema } from '../validators/client.validator.js';
 
 const router = Router();
 
@@ -47,7 +49,7 @@ router.use(authMiddleware());
  *               items:
  *                 $ref: '#/components/schemas/Client'
  */
-router.post('/', createClient);
+router.post('/', validate(createClientSchema), createClient);
 router.get('/', getAllClients);
 
 /**
@@ -116,7 +118,7 @@ router.get('/archived', getArchivedClients);
  *         description: Cliente eliminado
  */
 router.get('/:id', getClientById);
-router.patch('/:id', updateClient);
+router.patch('/:id', validate(updateClientSchema), updateClient);
 router.delete('/:id', deleteClient);
 
 /**

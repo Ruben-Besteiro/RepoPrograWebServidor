@@ -5,17 +5,20 @@ const projectSchema = new mongoose.Schema(
         user: {
             type: mongoose.Schema.Types.ObjectId,
             ref: 'User',
-            required: true
+            required: true,
+            index: true
         },
         company: {
             type: mongoose.Schema.Types.ObjectId,
             ref: 'Company',
-            required: true
+            required: true,
+            index: true
         },
         client: {
             type: mongoose.Schema.Types.ObjectId,
             ref: 'Client',
-            required: true
+            required: true,
+            index: true
         },
         name: String,
         projectCode: {
@@ -36,8 +39,14 @@ const projectSchema = new mongoose.Schema(
             required: true
         },
         notes: String,
-        active: Boolean,
-        deleted: Boolean,
+        active: {
+            type: Boolean,
+            index: true
+        },
+        deleted: {
+            type: Boolean,
+            index: true
+        },
     },
     {
         timestamps: true,

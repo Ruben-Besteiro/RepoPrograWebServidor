@@ -2,6 +2,8 @@ import { Router } from 'express';
 import { createDeliveryNote, signDeliveryNote, getAllDeliveryNotes, getDeliveryNoteById, downloadDeliveryNotePDF } from '../controllers/deliveryNote.controller.js';
 import { authMiddleware } from '../middleware/auth.middleware.js';
 import { uploadMiddleware } from '../middleware/upload.middleware.js';
+import { validate } from '../middleware/validate.middleware.js';
+import { createDeliveryNoteSchema } from '../validators/deliveryNote.validator.js';
 
 const router = Router();
 router.use(authMiddleware());
@@ -45,7 +47,7 @@ router.use(authMiddleware());
  *       200:
  *         description: Lista de albaranes
  */
-router.post('/', createDeliveryNote);
+router.post('/', validate(createDeliveryNoteSchema), createDeliveryNote);
 
 /**
  * @swagger
