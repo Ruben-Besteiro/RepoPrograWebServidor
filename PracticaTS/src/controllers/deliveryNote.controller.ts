@@ -134,6 +134,10 @@ export const getAllDeliveryNotes = async (req: Request, res: Response) => {
             }
         }
 
+        if (req.query.search) {
+            filter.description = { $regex: req.query.search, $options: 'i' };
+        }
+
         // Para paginación
         const page = parseInt(req.query.page as string) || 1;
         const limit = parseInt(req.query.limit as string) || 10;

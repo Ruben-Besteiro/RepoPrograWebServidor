@@ -12,17 +12,20 @@ const deliveryNoteSchema = new mongoose.Schema(
         company: {
             type: mongoose.Schema.Types.ObjectId,
             ref: 'Company',
-            required: true
+            required: true,
+            index: true
         },
         client: {
             type: mongoose.Schema.Types.ObjectId,
             ref: 'Client',
-            required: true
+            required: true,
+            index: true
         },
         project: {
             type: mongoose.Schema.Types.ObjectId,
             ref: 'Project',
-            required: true
+            required: true,
+            index: true
         },
         format: {
             type: String,
@@ -43,7 +46,10 @@ const deliveryNoteSchema = new mongoose.Schema(
         signedAt: Date,
         signatureUrl: String,       // URL de la imagen
         pdfUrl: String,
-        deleted: Boolean,
+        deleted: {
+            type: Boolean,
+            index: true
+        },
     },
     {
         timestamps: true,

@@ -1,6 +1,8 @@
 import { Router } from 'express';
 import { createProject, updateProject, deleteProject, getAllProjects, getProjectById, restoreProject, archiveProject } from '../controllers/project.controller.js';
 import { authMiddleware } from '../middleware/auth.middleware.js';
+import { validate } from '../middleware/validate.middleware.js';
+import { createProjectSchema, updateProjectSchema } from '../validators/project.validator.js';
 
 const router = Router();
 router.use(authMiddleware());
@@ -38,7 +40,7 @@ router.use(authMiddleware());
  *       200:
  *         description: Lista de proyectos
  */
-router.post('/', createProject);
+router.post('/', validate(createProjectSchema), createProject);
 router.get('/', getAllProjects);
 
 /**
@@ -93,7 +95,7 @@ router.get('/', getAllProjects);
  *         description: Proyecto eliminado
  */
 router.get('/:id', getProjectById);
-router.patch('/:id', updateProject);
+router.patch('/:id', validate(updateProjectSchema), updateProject);
 router.delete('/:id', deleteProject);
 
 /**

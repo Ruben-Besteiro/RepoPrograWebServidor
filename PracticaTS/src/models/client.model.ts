@@ -11,7 +11,8 @@ const clientSchema = new mongoose.Schema(
         },
         company: {
             type: mongoose.Schema.Types.ObjectId,
-            ref: 'Company'
+            ref: 'Company',
+            index: true
         },
         name: String,
         cif: {
@@ -33,7 +34,10 @@ const clientSchema = new mongoose.Schema(
             city: String,
             province: String
         },
-        deleted: Boolean,
+        deleted: {
+            type: Boolean,
+            index: true
+        },
     },
     {
         timestamps: true,

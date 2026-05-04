@@ -1,4 +1,4 @@
-@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2OWVmOWM3ZTVkN2UwMDk2ZjY2N2JiMjQiLCJzZXNzaW9uSWQiOiI2OWY0ODM4YWYwNTFjN2FmYWIxODVlYjUiLCJpYXQiOjE3Nzc2MzIxMzgsImV4cCI6MTc3NzcxODUzOH0.Di6I0qeS11HzH7YliCHe05IXN7-LXDM3Qb8j7ffsb8c
+@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2OWVmOWM3ZTVkN2UwMDk2ZjY2N2JiMjQiLCJzZXNzaW9uSWQiOiI2OWY4Y2FmN2ZkY2Y4ZWI4ZmM3NDRhYWQiLCJpYXQiOjE3Nzc5MTI1NjcsImV4cCI6MTc3Nzk5ODk2N30.QSTC_HMfsKR-CJL3teqT4oPWS95SiILYn-LIgui2p9s
 // El token debe ir arriba
 // No hace falta incluir el refresh token también
 
@@ -311,11 +311,11 @@ GET https://repoprograwebservidor-production.up.railway.app/api/project
 Authorization: Bearer {{token}}
 
 ### Obtener un proyecto por ID
-GET https://repoprograwebservidor-production.up.railway.app/api/project/69ee2438ae9477fa1b3e3444
+GET https://repoprograwebservidor-production.up.railway.app/api/project/69ef81274f98f406c641b421
 Authorization: Bearer {{token}}
 
 ### Borrar un proyecto
-DELETE https://repoprograwebservidor-production.up.railway.app/api/project/69ee2438ae9477fa1b3e3444
+DELETE https://repoprograwebservidor-production.up.railway.app/api/project/69ef81274f98f406c641b421
 Authorization: Bearer {{token}}
 
 ### Archivar un proyecto (soft delete)
