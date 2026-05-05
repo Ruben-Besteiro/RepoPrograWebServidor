@@ -5,7 +5,10 @@ import { UserInterface } from '../models/user.model.js';
 const JWT_SECRET = process.env.JWT_SECRET || 'secret';
 // Esto de aquí se puede poner en el .env pero paso de complicarme la vida
 const ACCESS_TOKEN_EXPIRES = '24h';  // Corto
-const REFRESH_TOKEN_DAYS = 9999999;        // Largo
+const REFRESH_TOKEN_DAYS = 14;        // Largo
+
+// Esto se llama desde el controlador de usuarios
+// En register y login para que nos devuelva el token
 
 /**
  * Genera access token (corta duración)

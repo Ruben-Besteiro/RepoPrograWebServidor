@@ -3,6 +3,8 @@ import { Request, Response, NextFunction } from 'express';
 import mongoose from 'mongoose';
 import { ZodSchema } from 'zod';
 
+// Esto valida los datos de la petición
+// Se llama cuando se crea o actualiza un recurso, por ejemplo validate(createUserSchema)
 export const validate = (schema: ZodSchema) => (req: Request, res: Response, next: NextFunction) => {
     try {
         schema.parse({

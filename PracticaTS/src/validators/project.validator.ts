@@ -18,8 +18,7 @@ export const createProjectSchema = z.object({
         }).optional(),
         email: z.string().email('Correo no válido').transform(email => email.toLowerCase()),
         notes: z.string().optional(),
-        active: z.boolean().optional().default(true),
-        deleted: z.boolean().optional().default(false),
+        active: z.boolean().optional().default(true)
     })
 });
 
@@ -37,7 +36,6 @@ export const updateProjectSchema = z.object({
         }).optional(),
         email: z.string().email('Correo no válido').transform(email => email.toLowerCase()).optional(),
         notes: z.string().optional(),
-        active: z.boolean().optional(),
-        deleted: z.boolean().optional(),
+        active: z.boolean().optional()
     })
 });

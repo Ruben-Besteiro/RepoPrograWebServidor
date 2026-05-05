@@ -2,6 +2,9 @@ import { z } from 'zod';
 
 const objectIdRegex = /^[0-9a-fA-F]{24}$/;
 
+// Estos son los validadores de Zod
+// Son funciones middleware y se llaman cuando en las rutas ponemos validate(x)
+
 export const createClientSchema = z.object({
     body: z.object({
         user: z.string().regex(objectIdRegex, 'ID de usuario no válido').optional(),
@@ -16,8 +19,7 @@ export const createClientSchema = z.object({
             postal: z.string().optional(),
             city: z.string().optional(),
             province: z.string().optional()
-        }).optional(),
-        deleted: z.boolean().optional().default(false),
+        }).optional()
     })
 });
 
@@ -33,7 +35,6 @@ export const updateClientSchema = z.object({
             postal: z.string().optional(),
             city: z.string().optional(),
             province: z.string().optional()
-        }).optional(),
-        deleted: z.boolean().optional(),
+        }).optional()
     })
 });

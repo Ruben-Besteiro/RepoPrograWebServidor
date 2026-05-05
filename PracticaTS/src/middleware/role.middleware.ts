@@ -2,8 +2,7 @@
 import { Request, Response, NextFunction } from 'express';
 import { AppError } from '../utils/AppError.js';
 
-// Esto se llamará cuando queramos usar un endpoint que requiera un rol específico
-// Por ejemplo, para crear una peli, se necesita el rol 'admin'
+// Esto se llamará en las rutas cuando queramos usar un endpoint que requiera un rol
 
 /**
  * Middleware de autorización por rol

@@ -3,6 +3,8 @@ import { Request, Response, NextFunction } from 'express';
 import { AppError } from '../utils/AppError.js';
 import { sendSlackMessage } from '../services/slack.service.js';
 
+// En el app ponemos app.use(errorHandler), que es esto
+// Se llama en cualquier lugar donde haya un throw new AppError()
 export const errorHandler = (err: any, req: Request, res: Response, next: NextFunction) => {
     err.statusCode = err.statusCode || 500;
     err.status = err.status || 'error';

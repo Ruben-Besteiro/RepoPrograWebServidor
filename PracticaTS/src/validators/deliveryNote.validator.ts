@@ -26,8 +26,7 @@ export const createDeliveryNoteSchema = z.object({
         signed: z.boolean().optional().default(false),
         signedAt: z.coerce.date().optional(),
         signatureUrl: z.string().url('URL de firma no válida').optional(),
-        pdfUrl: z.string().url('URL de PDF no válida').optional(),
-        deleted: z.boolean().optional().default(false),
+        pdfUrl: z.string().url('URL de PDF no válida').optional()
     })
 });
 
@@ -50,8 +49,7 @@ export const updateDeliveryNoteSchema = z.object({
         })).optional(),
         signed: z.boolean().optional(),
         signedAt: z.coerce.date().optional(),
-        signatureUrl: z.string().url().optional(),
-        pdfUrl: z.string().url().optional(),
-        deleted: z.boolean().optional(),
+        signatureUrl: z.string().url('URL de firma no válida').optional(),
+        pdfUrl: z.string().url('URL de PDF no válida').optional()
     })
 });

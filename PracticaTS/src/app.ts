@@ -77,7 +77,7 @@ const PORT = process.env.PORT || 3000;
 // En la variable server almacenamos el servidor como un objeto
 let server: ReturnType<typeof app.listen> | null = null;
 
-// Aquí rellenamos la variable server
+// Aquí rellenamos la variable server y nos conectamos a Mongo
 const startServer = async () => {
   console.log(`Intentando conectar a: ${process.env.MONGO_URL} (Base de datos: ${process.env.DB_NAME || 'default'})`);
   await dbConnect();

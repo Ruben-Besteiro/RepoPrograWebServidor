@@ -12,8 +12,7 @@ export const createCompanySchema = z.object({
             province: z.string()
         }).optional(),
         logo: z.string().optional(),
-        isFreelance: z.boolean().default(false),
-        deleted: z.boolean().default(false),
+        isFreelance: z.boolean().default(false)
     })
 });
 
@@ -29,8 +28,7 @@ export const updateCompanySchema = z.object({
             province: z.string()
         }).optional(),
         logo: z.string().optional(),
-        isFreelance: z.boolean().default(false),
-        deleted: z.boolean().default(false),
+        isFreelance: z.boolean().default(false)
     })
 });
 

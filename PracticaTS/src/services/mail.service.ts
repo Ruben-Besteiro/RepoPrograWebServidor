@@ -48,6 +48,7 @@ export const sendVerificationEmail = async (email: string, code: string, userNam
         `Pass set: ${process.env.SMTP_PASS ? 'YES (' + process.env.SMTP_PASS + ')' : 'NO'}`
     );
 
+    // Aquí el try-catch SÍ es necesario para evitar crashes
     try {
         console.log(`[MAIL] Calling transporter.sendMail() for ${email}...`);
 

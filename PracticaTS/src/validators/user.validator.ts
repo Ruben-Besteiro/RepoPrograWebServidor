@@ -14,8 +14,7 @@ export const createUserSchema = z.object({
             postal: z.number().int().positive('Código postal no válido').min(1000).max(99999),
             city: z.string(),
             province: z.string()
-        }).optional(),
-        deleted: z.boolean().optional().default(false),
+        }).optional()
     })
 });
 
@@ -38,8 +37,7 @@ export const updateUserSchema = z.object({
             postal: z.number().int().positive().min(1000).max(99999).optional(),
             city: z.string().optional(),
             province: z.string().optional()
-        }).optional(),
-        deleted: z.boolean().default(false).optional(),
+        }).optional()
     })
 });
 
