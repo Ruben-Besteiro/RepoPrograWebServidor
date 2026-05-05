@@ -3,7 +3,7 @@
 import eventService from '../services/event.service.js';
 import { sendVerificationEmail } from '../services/mail.service.js';
 
-// Listener for user registered
+// Escuchador de registro
 eventService.on('user:registered', async (user) => {
     console.log(`[EVENT] user:registered - User: ${user.fullName}, Email: ${user.email}`);
 
@@ -22,19 +22,17 @@ eventService.on('user:registered', async (user) => {
     }
 });
 
-// Listener for user verified
+// Escuchador de usuario verificado
 eventService.on('user:verified', (user) => {
     console.log(`[EVENT] user:verified - User: ${user.fullName}, Email: ${user.email}`);
 });
 
-// Listener for user invited
+// Escuchador de usuario invitado
 eventService.on('user:invited', (user) => {
     console.log(`[EVENT] user:invited - User: ${user.fullName}, Email: ${user.email}`);
 });
 
-// Listener for user deleted
+// Escuchador de usuario eliminado
 eventService.on('user:deleted', (userData) => {
     console.log(`[EVENT] user:deleted - User Data: ${JSON.stringify(userData)}`);
 });
-
-console.log('✅ User listeners registered');

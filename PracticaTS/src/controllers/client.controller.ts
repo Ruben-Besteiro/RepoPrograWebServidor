@@ -13,31 +13,26 @@ export const createClient = async (req: Request, res: Response) => {
 };
 
 export const updateClient = async (req: Request, res: Response) => {
-    try {
-        // Extraemos solo los campos seguros
-        const { name, email, phone, cif, address } = req.body;
-        const updateData: any = { name, email, phone, cif, address };
+    // Extraemos solo los campos seguros
+    const { name, email, phone, cif, address } = req.body;
+    const updateData: any = { name, email, phone, cif, address };
 
-        // Eliminamos las propiedades undefined
-        Object.keys(updateData).forEach(key => updateData[key] === undefined && delete updateData[key]);
+    // Eliminamos las propiedades undefined
+    Object.keys(updateData).forEach(key => updateData[key] === undefined && delete updateData[key]);
 
-        const client = await Client.findOneAndUpdate(
-            { _id: req.params.id, deleted: false },     // Solo si no está borrado
-            updateData,
-            { new: true, runValidators: true }
-        );
+    const client = await Client.findOneAndUpdate(
+        { _id: req.params.id, deleted: false },     // Solo si no está borrado
+        updateData,
+        { new: true, runValidators: true }
+    );
 
-        if (!client) {
-            throw new AppError('ERROR_CLIENT_NOT_FOUND_OR_ARCHIVED', 404);
-        }
-
-        client.updatedAt = new Date();
-        await client.save();
-        res.status(200).json(client);
-    } catch (err) {
-        if (err instanceof AppError) throw err;
-        throw AppError.internal('ERROR_UPDATE_CLIENT');
+    if (!client) {
+        throw new AppError('ERROR_CLIENT_NOT_FOUND_OR_ARCHIVED', 404);
     }
+
+    client.updatedAt = new Date();
+    await client.save();
+    res.status(200).json(client);
 };
 
 export const getAllClients = async (req: Request, res: Response) => {

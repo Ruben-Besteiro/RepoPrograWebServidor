@@ -27,31 +27,26 @@ export const createProject = async (req: Request, res: Response) => {
 };
 
 export const updateProject = async (req: Request, res: Response) => {
-    try {
-        // Extraemos solo los campos que permitimos actualizar
-        const { name, client, projectCode, address, email, notes, active } = req.body;
-        const updateData: any = { name, client, projectCode, address, email, notes, active };
+    // Extraemos solo los campos que permitimos actualizar
+    const { name, client, projectCode, address, email, notes, active } = req.body;
+    const updateData: any = { name, client, projectCode, address, email, notes, active };
 
-        // Eliminamos las propiedades undefined para no machacar datos existentes
-        Object.keys(updateData).forEach(key => updateData[key] === undefined && delete updateData[key]);
+    // Eliminamos las propiedades undefined para no machacar datos existentes
+    Object.keys(updateData).forEach(key => updateData[key] === undefined && delete updateData[key]);
 
-        const project = await Project.findOneAndUpdate(
-            { _id: req.params.id, deleted: false },
-            updateData,
-            { new: true, runValidators: true }
-        );
+    const project = await Project.findOneAndUpdate(
+        { _id: req.params.id, deleted: false },
+        updateData,
+        { new: true, runValidators: true }
+    );
 
-        if (!project) {
-            throw new AppError('ERROR_PROJECT_NOT_FOUND_OR_ARCHIVED', 404);
-        }
-
-        project.updatedAt = new Date();
-        await project.save();
-        res.status(200).json(project);
-    } catch (error) {
-        if (error instanceof AppError) throw error;
-        throw AppError.internal('ERROR_UPDATE_PROJECT');
+    if (!project) {
+        throw new AppError('ERROR_PROJECT_NOT_FOUND_OR_ARCHIVED', 404);
     }
+
+    project.updatedAt = new Date();
+    await project.save();
+    res.status(200).json(project);
 };
 
 export const deleteProject = async (req: Request, res: Response) => {

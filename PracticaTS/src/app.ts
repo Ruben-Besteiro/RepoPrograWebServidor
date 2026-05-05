@@ -74,8 +74,10 @@ app.use(errorHandler);
 // Iniciar servidor
 const PORT = process.env.PORT || 3000;
 
+// En la variable server almacenamos el servidor como un objeto
 let server: ReturnType<typeof app.listen> | null = null;
 
+// Aquí rellenamos la variable server
 const startServer = async () => {
   console.log(`Intentando conectar a: ${process.env.MONGO_URL} (Base de datos: ${process.env.DB_NAME || 'default'})`);
   await dbConnect();
@@ -84,12 +86,12 @@ const startServer = async () => {
   });
 };
 
-// Graceful shutdown
+// Graceful shutdown (usamos la variable server para cerrarlo)
 const shutdown = async (signal: string) => {
   console.log(`${signal} recibido. Cerrando servidor...`);
 
+  // Si el servidor existe y ha petado, cerramos la conexión con Mongo
   if (server) {
-    // Si el servidor existe y ha petado, cerramos la conexión con Mongo
     server.close(() => {
       console.log('Servidor HTTP cerrado');
       mongoose.connection.close().then(() => {
@@ -120,10 +122,12 @@ const shutdown = async (signal: string) => {
   }, 10000);
 };
 
-// Aquí llamamos al graceful shutdown cuando peta
+// Aquí llamamos al graceful shutdown cuando peta (va después porque todavía no hemos iniciado el servidor)
 process.on('SIGTERM', () => shutdown('SIGTERM'));
 process.on('SIGINT', () => shutdown('SIGINT'));
 
+// Es obligatorio poner esto lo último porque antes de iniciar el servidor
+// todo lo demás debe haber sido leído y cargado
 if (process.env.NODE_ENV !== 'test') {
   startServer();
 }
