@@ -126,7 +126,7 @@ describe('Project Controller', () => {
         it('debería retornar proyectos no borrados', async () => {
             (Project.find as any).mockResolvedValue([{ name: 'P1' }]);
             await getAllProjects(req, res);
-            expect(Project.find).toHaveBeenCalledWith({ deleted: false });
+            expect(Project.find).toHaveBeenCalledWith({ company: 'company123', deleted: false });
             expect(res.status).toHaveBeenCalledWith(200);
         });
     });
@@ -177,7 +177,7 @@ describe('Project Controller', () => {
         it('debería listar archivados', async () => {
             (Project.find as any).mockResolvedValue([]);
             await getArchivedProjects(req, res);
-            expect(Project.find).toHaveBeenCalledWith({ deleted: true });
+            expect(Project.find).toHaveBeenCalledWith({ company: 'company123', deleted: true });
             expect(res.status).toHaveBeenCalledWith(200);
         });
     });

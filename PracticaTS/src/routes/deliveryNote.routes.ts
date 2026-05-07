@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { createDeliveryNote, signDeliveryNote, getAllDeliveryNotes, getDeliveryNoteById, downloadDeliveryNotePDF } from '../controllers/deliveryNote.controller.js';
+import { createDeliveryNote, signDeliveryNote, getAllDeliveryNotes, getDeliveryNoteById, downloadDeliveryNotePDF, deleteDeliveryNote } from '../controllers/deliveryNote.controller.js';
 import { authMiddleware } from '../middleware/auth.middleware.js';
 import { uploadMiddleware } from '../middleware/upload.middleware.js';
 import { validate } from '../middleware/validate.middleware.js';
@@ -178,5 +178,6 @@ router.patch('/:id', uploadMiddleware.single('signature'), signDeliveryNote);
  *         description: Albarán descargado
  */
 router.get('/pdf/:id', downloadDeliveryNotePDF);
+router.delete('/:id', deleteDeliveryNote);
 
 export default router;

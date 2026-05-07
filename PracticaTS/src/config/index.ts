@@ -4,6 +4,7 @@ import dns from 'dns';
 
 dns.setServers(['8.8.8.8', '8.8.4.4']);   // Esto de aquí es obligatorio para resolver el problema del ECONNREFUSED
 
+// Esto se llama en el router en app.ts
 const dbConnect = async () => {
     const DATABASE_URI = process.env.MONGO_URL;
 

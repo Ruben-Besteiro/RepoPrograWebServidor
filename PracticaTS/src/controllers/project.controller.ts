@@ -62,7 +62,7 @@ export const deleteProject = async (req: Request, res: Response) => {
 };
 
 export const getAllProjects = async (req: Request, res: Response) => {
-    const projects = await Project.find({ deleted: false });
+    const projects = await Project.find({ company: req.user!.company, deleted: false });
     res.status(200).json(projects);
 };
 
@@ -109,6 +109,6 @@ export const restoreProject = async (req: Request, res: Response) => {
 };
 
 export const getArchivedProjects = async (req: Request, res: Response) => {
-    const projects = await Project.find({ deleted: true });
+    const projects = await Project.find({ company: req.user!.company, deleted: true });
     res.status(200).json(projects);
 };

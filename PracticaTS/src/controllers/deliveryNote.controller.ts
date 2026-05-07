@@ -83,7 +83,7 @@ export const signDeliveryNote = async (req: Request, res: Response) => {
 };
 
 export const getAllDeliveryNotes = async (req: Request, res: Response) => {
-    const filter: any = { deleted: false };
+    const filter: any = { company: req.user!.company, deleted: false };
 
     // Filtros
 

@@ -29,7 +29,7 @@ model User {
   loans     Loan[]
   reviews   Review[]
 
-  @@map("users")
+  @@map("users")    // "map" es el nombre de la tabla en la base de datos
 }
 
 enum Role {

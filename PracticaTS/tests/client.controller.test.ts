@@ -96,7 +96,7 @@ describe('Client Controller', () => {
 
             await getAllClients(req, res);
 
-            expect(Client.find).toHaveBeenCalledWith({ deleted: false });
+            expect(Client.find).toHaveBeenCalledWith({ company: 'company123', deleted: false });
             expect(res.json).toHaveBeenCalledWith(mockClients);
         });
     });
@@ -182,7 +182,7 @@ describe('Client Controller', () => {
         it('debería retornar clientes archivados', async () => {
             (Client.find as any).mockResolvedValue([{ name: 'Archived' }]);
             await getArchivedClients(req, res);
-            expect(Client.find).toHaveBeenCalledWith({ deleted: true });
+            expect(Client.find).toHaveBeenCalledWith({ company: 'company123', deleted: true });
             expect(res.status).toHaveBeenCalledWith(200);
         });
     });
