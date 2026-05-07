@@ -37,7 +37,6 @@ describe('Multi-tenant Isolation Test', () => {
         const reqA: any = {
             user: { _id: 'userA', company: 'companyA' }
         };
-
         const clientsA = [{ name: 'Cliente A1', company: 'companyA' }];
         (Client.find as any).mockResolvedValue(clientsA);
 
@@ -52,7 +51,6 @@ describe('Multi-tenant Isolation Test', () => {
         const reqB: any = {
             user: { _id: 'userB', company: 'companyB' }
         };
-
         const clientsB = [{ name: 'Cliente B1', company: 'companyB' }];
         (Client.find as any).mockResolvedValue(clientsB);
 
