@@ -8,7 +8,7 @@ export const createClient = async (req: Request, res: Response) => {
     const user = req.user!._id;         // El ID de Mongo del usuario que lo creó
     const client = new Client({ name, email, phone, cif, address, company, user });
     client.deleted = false;
-    await client.save();
+    await client.save();        // Para añadir el objeto actual a la base de datos
     res.status(201).json(client);
 };
 
@@ -36,7 +36,7 @@ export const updateClient = async (req: Request, res: Response) => {
 };
 
 export const getAllClients = async (req: Request, res: Response) => {
-    const clients = await Client.find({ deleted: false });
+    const clients = await Client.find({ company: req.user!.company, deleted: false });
     //clients.forEach(client => client.populate('User', 'Company'));
     res.status(200).json(clients);
 };
@@ -99,6 +99,6 @@ export const restoreClient = async (req: Request, res: Response) => {
 };
 
 export const getArchivedClients = async (req: Request, res: Response) => {
-    const clients = await Client.find({ deleted: true });
+    const clients = await Client.find({ company: req.user!.company, deleted: true });
     res.status(200).json(clients);
 };

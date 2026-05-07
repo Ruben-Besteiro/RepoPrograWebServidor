@@ -224,7 +224,7 @@ describe('DeliveryNote Controller', () => {
             };
             (DeliveryNote.find as any).mockReturnValue(chainMock);
             await getAllDeliveryNotes(req, res);
-            expect(DeliveryNote.find).toHaveBeenCalledWith({ deleted: false });
+            expect(DeliveryNote.find).toHaveBeenCalledWith({ company: 'company123', deleted: false });
             expect(chainMock.sort).toHaveBeenCalledWith({ createdAt: -1 });
             expect(res.status).toHaveBeenCalledWith(200);
         });
